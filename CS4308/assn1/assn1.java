@@ -61,6 +61,7 @@ public class assn1 {
         // Input for first complex number
         System.out.print("Enter the real part of the first complex number: ");
         double real1 = scanner.nextDouble();
+
         System.out.print("Enter the imaginary part of the first complex number: ");
         double imaginary1 = scanner.nextDouble();
         ComplexNumber num1 = new ComplexNumber(real1, imaginary1);
