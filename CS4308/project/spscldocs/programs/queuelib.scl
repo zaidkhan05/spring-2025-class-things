@@ -1,0 +1,60 @@
+
+import "queueh.c"
+
+/* File: queuelib.scl
+  This is the implementation of functions for
+  a queue using double ended linked list with  data blocks.
+  J. M. Garrido Feb 2022
+***  Note: the programmer (user) needs to define a 
+  data structure with name 'Datablock' 
+*/  
+
+implementations
+
+function create_queue parameters queue pointer of type queueT,
+  maxn of type integer, sname pointer of type char
+is
+begin
+    call init_list using queue, maxn, sname
+endfun create_queue
+//
+function enqueue parameters queue pointer of type queueT,
+    cdata pointer of type DataT
+is
+begin
+    call insert_last using queue, cdata
+endfun enqueue
+//
+function dequeue return pointer of type DataT parameters queue pointer of type queueT
+is
+begin
+    return remove_front(queue)
+endfun dequeue
+//
+// get a copy of node at head of queue
+function head return pointer of type DataT parameters queue pointer of type queueT
+is
+begin
+   // get data from head of queue
+   return get_front(queue)
+endfun head
+//
+function sEmpty return type bool parameters queue pointer of type queueT
+is
+begin
+   return empty_list (queue) 
+endfun sEmpty
+//
+function sFull return type bool parameters queue pointer of type queueT
+is
+begin
+   return full_list (queue) 
+endfun sFull
+//
+function queueSize return type integer parameters queue pointer of type queueT
+is
+begin
+   return listSize(queue)
+endfun queueSize
+
+

@@ -1,0 +1,48 @@
+/*
+ Program     : factp.scl
+ Author      : Jose M Garrido, Nov 28 2021.
+ Description : Compute the factorial of a number.
+*/
+import <stdio.h>
+import <math.h>
+
+forward declarations
+ function fact return type integer 
+    parameters y of type integer     
+	
+implementations
+	
+function main is
+ variables
+   define num of type integer
+   define r of type integer
+ begin   
+     displayn  "Enter number: "
+	 read num
+     display "\n Value of input number: ", num
+     set r = fact(num)
+     display " Factorial is: ", r
+     return 0    // execution terminates ok 
+endfun main
+//
+function fact return type integer
+   parameters y of type integer is
+variables
+   define f of type integer
+   define n of type integer
+   define res of type integer
+ begin
+   set f = 1
+   if y > 0 then
+        for n = 1 to n <= y do 
+            set f = f * n
+		endfor
+        set res = f
+    elseif y equal 0 then 
+            set  res = 1
+     else
+         set res = -1
+	endif
+    return res
+endfun fact
+

@@ -1,0 +1,347 @@
+
+import "link2h.c"
+/* File: linked2lib.scl
+  This is the implementation of functions for
+  double-linked list with two ends using data blocks.
+  J. M. Garrido Feb 2021
+
+***  Note: the programmer (user) needs to define a 
+  data structure with name 'Datablock' 
+*/  
+implementations 
+
+function init_list parameters 
+    plist pointer of type listT,
+    maxn of type integer, pname pointer of type char 
+is
+begin
+   set Head of plist = NULL // head
+   set Tail of plist = NULL // tail
+   set numnodes of plist = 0
+   set maxnodes of plist = maxn
+   call strcpy using lname of plist, pname
+endfun init_list
+//
+function insert_front parameters plist pointer of type listT,
+   cdata pointer of type DataT is
+ structures
+   define newPtr of type NodePtr // pointer for a new node
+   define lnodeP of type NodePtr 
+begin
+   if full_list(plist) equal true then
+      return
+   endif
+   // create new node
+   create newPtr type NodeType
+   // fill data into the new node
+   set newPtr->datablock = cdata
+   set newPtr->next = NULL
+   set newPtr->prev = NULL
+   if plist->Head == NULL then  // is list empty?
+       set plist->Head = newPtr   // the new head node
+       set plist->Tail = newPtr   // new tail node
+   else 
+       set lnodeP = plist->Head
+       set newPtr->next = lnodeP  // new node now points to current front
+       set lnodeP->prev = newPtr
+       set plist->Head = newPtr     // the front is now the new node
+   endif
+   increment plist->numnodes
+   set plist->current = newPtr
+endfun insert_front
+//
+function insert_node parameters plist pointer of type listT,
+   pdata pointer of type DataT, pos of type integer is
+ variables
+   define i of type integer
+ structures
+   define newPtr of type NodePtr  // pointer for a new node
+   define cnodeptr of type NodePtr
+   define lnodeP of type NodePtr 
+ begin
+   if plist->numnodes < pos or full_list(plist) == true 
+   then
+      return
+   endif
+   // create new node
+   create newPtr type NodeType   
+   // fill data to the new node
+   set newPtr->datablock = pdata
+   set cnodeptr = plist->Head   // point to first node
+   if pos == 1 then
+      set lnodeP = cnodeptr->next
+      set newPtr->next = cnodeptr->next
+      set newPtr->prev = cnodeptr
+      set lnodeP->prev = newPtr
+      increment plist->numnodes
+      set plist->current = newPtr
+      return
+   endif
+   for i = 2 to i <=pos do
+      set cnodeptr = cnodeptr->next // next node
+   endfor
+   set newPtr->next = cnodeptr->next 
+   set lnodeP = cnodeptr->next
+   set newPtr->prev = lnodeP->prev
+   set cnodeptr->next = newPtr
+   set lnodeP->prev = newPtr
+   if pos == plist->numnodes then // insert after last
+      set plist->Tail = newPtr
+   endif
+   increment plist->numnodes
+   set plist->current = newPtr
+endfun insert_node
+//
+function insert_last parameters plist pointer of type listT,
+     ndata pointer of type DataT is
+ structures
+   define newPtr of type NodePtr  // pointer for a new node
+   define cnodeptr of type NodePtr
+begin
+   if full_list(plist) == true then
+      return
+   endif
+   // create new node
+   create newPtr type NodeType
+   // fill data to the new node
+   set newPtr->datablock = ndata
+   set cnodeptr = plist->Tail
+   if cnodeptr != NULL then
+      set cnodeptr->next = newPtr
+   else                        // list is empty
+      set plist->Head = newPtr
+   endif
+   set newPtr->prev = cnodeptr
+   set plist->Tail = newPtr // new tail
+   increment plist->numnodes
+   set plist->current = newPtr
+endfun insert_last
+//
+function remove_front return pointer of type DataT
+   parameters plist pointer of type listT is
+   // complete unlink first node from list and 
+   //   return pointer to the data block in node
+ structures
+   define cnodeptr of type NodePtr 
+   define lblock pointer of type DataT
+begin
+   if empty_list(plist) == true then
+      return NULL
+   endif
+   set cnodeptr = plist->Head   // pointer to current head node
+   if cnodeptr == NULL then
+      return NULL
+   endif
+   set plist->Head = cnodeptr->next // pointer to second node
+   if plist->Head == NULL then   // list now empty
+       set plist->Tail = NULL
+   endif
+   set lblock = cnodeptr->datablock // copy data
+   destroy cnodeptr // call free using cnodeptr  
+   decrement plist->numnodes
+   set plist->current = plist->Head
+   return lblock
+endfun remove_front
+//
+function get_front return pointer of type DataT parameters 
+   plist pointer of type listT    // get data from first node
+is
+   // get data from first node (front)
+ structures
+   define lblock pointer of type DataT
+   define interm of type NodePtr
+begin
+   if empty_list(plist) == true then
+      return NULL
+   endif
+   set interm = plist->Head
+   set lblock = interm->datablock
+   set plist->current = plist->Head
+   return lblock
+endfun get_front
+//
+function get_next return pointer of type DataT parameters
+   plist pointer of type listT    // copy data from next node
+is
+   // get data block from next node
+structures
+   define lblock pointer of type DataT
+   define interm of type NodePtr
+begin
+   if plist->current == NULL then
+       return NULL
+   endif  
+   set interm = plist->current   
+   set plist->current = interm->next // next node
+   if plist->current == NULL then
+       return NULL
+   endif
+   set interm = plist->current
+   set lblock = interm->datablock
+   return lblock
+endfun get_next
+//
+function get_data return pointer of type DataT
+   parameters plist pointer of type listT, pos of type integer 
+is
+   // get data from node at pos in list and 
+   //   return pointer to this node
+variables
+   define i of type integer
+structures
+   define cnodeptr of type NodePtr
+   define lnode of type NodePtr
+   define lblock pointer of type DataT
+begin   
+   if empty_list(plist) == true or pos > plist->numnodes
+   then
+      return NULL
+   endif
+   set cnodeptr = plist->Head   // point to first node
+   if pos == 1 then
+        set lblock = cnodeptr->datablock // copy data       
+        return lblock
+   endif
+   for i = 2 to i < pos do
+       set cnodeptr = cnodeptr->next // next node
+   endfor
+   //current node is one before pos
+   set lnode = cnodeptr->next    // node found
+   set lblock = lnode->datablock // copy data
+   set plist->current = lnode
+   return lblock
+endfun get_data   
+//
+function remove_node return pointer of type DataT
+   parameters plist pointer of type listT,
+        pos of type integer
+is
+   // completely unlink node at pos from list and 
+   //  return pointer to data block of this node
+variables 
+   define i of type integer
+structures
+   define cnodeptr of type NodePtr
+   define prevnode of type NodePtr 
+   define lnodeptr of type NodePtr 
+   define ldatab pointer of type DataT
+   define interm of type NodePtr
+begin
+   if empty_list(plist) == true or pos > plist->numnodes
+   then
+      return NULL
+   endif
+   set prevnode = plist->Head // start with first node
+   set cnodeptr = prevnode->next
+   decrement plist->numnodes
+   set interm = plist->Head
+   if interm->next == NULL and pos == 1
+   then 
+      // only one node in list?  
+      set plist->Head = NULL
+      set plist->Tail = NULL
+      set plist->numnodes = 0   // now list is empty
+      set ldatab = prevnode->datablock
+      destroy prevnode      // free(prevnode); 
+      set plist->current = NULL
+      return ldatab
+   endif
+   if  pos == 1 then
+       set ldatab = prevnode->datablock
+       set plist->Head = cnodeptr
+       set cnodeptr->prev = NULL
+       set plist->current = plist->Head
+       destroy prevnode     // free(prevnode); 
+       return ldatab
+   endif
+   if pos == 2 then
+       set ldatab = cnodeptr->datablock
+       set lnodeptr = cnodeptr->next
+       set prevnode->next = lnodeptr
+       if lnodeptr != NULL then       // no more nodes ?         
+           set lnodeptr->prev = prevnode
+       endif
+       set plist->current = plist->Head
+       destroy cnodeptr              // free(cnodeptr); 
+       if pos == plist->numnodes+1 then    // node 2 is last?
+           set plist->Tail = prevnode
+       endif
+       return ldatab
+   endif
+   set i = 3
+   while cnodeptr->next != NULL && i < pos do  // traverse list
+       set cnodeptr = cnodeptr->next   // next node
+       increment i
+   endwhile
+   // prevnode is one before last
+   set prevnode = cnodeptr->prev
+   set prevnode->next = cnodeptr->next
+   set lnodeptr = cnodeptr->next
+   if lnodeptr != NULL then         // no more nodes ?  
+      set lnodeptr->prev = prevnode
+   endif
+   if pos == (plist->numnodes +1) then    // tail node?
+       set plist->Tail = prevnode
+   endif
+   set ldatab = cnodeptr->datablock     // copy data
+   destroy cnodeptr     // free(cnodeptr); 
+   set plist->current = prevnode
+   return ldatab
+endfun remove_node
+//
+function remove_last return pointer of type DataT
+  parameters plist pointer of type listT  // remove last node
+is
+   // complete unlink last node from list and 
+   //   return pointer to this node
+structures
+   define cnodeptr of type NodePtr 
+   define prevnode of type NodePtr 
+   define ldatab pointer of type DataT  // data block
+begin
+   if empty_list(plist) == true  then
+       return NULL
+   endif
+   set cnodeptr = plist->Tail
+   set prevnode = cnodeptr->prev
+   set plist->Tail = prevnode     // new tail
+   if prevnode != NULL then
+       set prevnode->next = NULL
+   endif
+   set ldatab = cnodeptr->datablock    // copy data
+   destroy cnodeptr        //free(cnodeptr); 
+   decrement plist->numnodes
+   return ldatab
+endfun remove_last
+//
+function empty_list return type bool parameters 
+  plist pointer of type listT   
+is
+begin
+   if plist->Head == NULL or plist->numnodes == 0
+   then
+      return true
+   else
+      return false
+   endif
+endfun empty_list
+//
+function full_list return type bool parameters 
+  plist pointer of type listT 
+is
+begin
+   if plist->numnodes < plist->maxnodes then 
+      return false
+   else
+      return true
+   endif
+endfun full_list
+//
+function listSize return type integer
+   parameters plist pointer of type listT
+is
+begin
+   return plist->numnodes
+endfun listSize
+
+   

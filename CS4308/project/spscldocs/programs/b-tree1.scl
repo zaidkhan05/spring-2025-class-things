@@ -1,0 +1,742 @@
+// Program with implementation of 
+// B-tree
+
+import "b-tree1h.c" // ADT of B-tree
+
+forward declarations
+
+// initialze a new node
+function BTreeNode_init parameters
+    pmindeg of type integer, pleaf of type bool, node pointer of type BTreeNode
+
+// Traverse all nodes in a subtree rooted with this node
+function traverse parameters node pointer of type BTreeNode
+
+// Search a key in subtree rooted with this node.
+function search return pointer of type BTreeNode parameters
+     pkey of type integer, node pointer of type BTreeNode
+     
+// Returns the index of the first key that is greater
+// or equal to pkey
+function findKey return type integer parameters
+    pkkey of type integer, node pointer of type BTreeNode
+
+// Auxiliary function to insert a new key in the subtree rooted with
+// this node. The node must be non-full 
+function insertNonFull parameters pkey of type integer, node pointer of type BTreeNode
+
+// Auxiliary function to split the child y of this node. 
+// The Child must be full 
+function splitChild parameters pindx of type integer, 
+    pchild pointer of type BTreeNode, node pointer of type BTreeNode
+
+// Remove the key pkey in subtree rooted with this node.
+function remove_key parameters pkey of type integer, node pointer of type BTreeNode
+
+// Remove the key present in position pindx in
+// this node which is a leaf
+function removeFromLeaf parameters pindx of type integer, node pointer of type BTreeNode
+
+// Remove the key present in position pindx in
+// this node which is a non-leaf node
+function removeFromNonLeaf parameters pindx of type integer, node pointer of type BTreeNode
+
+// Get the predecessor of the key in the position pindx in the node
+function getPred return type integer parameters pindx of type integer, node pointer of type BTreeNode
+
+// Get the successor of the key in position pindx in the node
+function getSucc return type integer parameters pindx of type integer, 
+     node pointer of type BTreeNode
+
+// Fill up the child node present in position pindx in array Child[] 
+//    if that child has less than mindeg-1 keys
+function fill parameters pindx of type integer, node pointer of type BTreeNode
+
+// Borrow a key from node at Child[pindx-1] and move
+//  to Child[pindx] node
+function borrowFromPrev parameters pindx of type integer, node pointer of type BTreeNode
+
+// Borrow a key from node in Child[pindx+1] and move
+// to node at Child[pindx]
+function borrowFromNext parameters pindx of type integer , node pointer of type BTreeNode
+
+// Merge child pindx of the node with child pindx+1 of
+// the node
+function merge parameters pindx of type integer, node pointer of type BTreeNode
+
+implementations
+
+function BTreeNode_init parameters pmindeg of type integer, leaf1 of type bool, node pointer of type BTreeNode
+is
+begin
+    // Copy minimum degree and leaf property
+    set node->mindeg = pmindeg
+    set node->leaf = leaf1
+
+    // numkeys = [2*mindeg-1]
+    // Child = [2*mindeg]
+    set node->numkeys = 0
+endfun BTreeNode_init
+//
+// Return the index of the first key that is
+// greater than or equal to pkey
+function findKey return type integer parameters
+    pkey of type integer, node pointer of type BTreeNode is
+variables
+    define indx of type integer = 0
+begin   
+    while indx < node->numkeys and node->keys[indx] < pkey do
+         increment indx
+    endwhile
+    return indx
+endfun findKey
+//
+// Remove the key pkey in subtree rooted with this node.
+function remove_key parameters pkey of type integer, node pointer of type BTreeNode
+is
+variables
+    define indx of type integer
+    define flag of type bool
+structures
+    define lchild pointer of type BTreeNode 
+begin
+    set indx = findKey (pkey, node)
+
+    // if key to remove is present
+    if indx < node->numkeys  and node->keys[indx] equal pkey then
+        // If the node is a leaf node - removeFromLeaf is called
+        // Otherwise, removeFromNonLeaf function is called
+        if node->leaf equal true then
+            call removeFromLeaf using indx, node
+        else
+            call removeFromNonLeaf using indx, node
+        endif
+    else
+        // If this node is a leaf node, then the key is not present in tree
+        if node->leaf equal true then
+            display "This key does not exist in the tree\n", pkey
+            return
+        endif
+
+        // The key to remove is in the sub-tree rooted with this node
+        // The flag indicates whether the key is present in the sub-tree rooted
+        // with the last child of this node
+        if indx equal node->numkeys then
+           set flag = true
+        else
+           set flag = false
+        endif
+
+        set lchild = node->Child[indx]
+        if lchild->numkeys < node->mindeg then
+            call fill using indx, node
+        endif
+        // If the last child has been merged, it must have merged with the previous
+        // child and so we recurse on the (idx-1)th child. Else, we recurse on the
+        // (idx)th child which now has atleast t keys
+        if flag equal true and indx > node->numkeys then
+             call remove_key using pkey, node->Child[indx-1]
+        else
+             call remove_key using pkey, node->Child[indx]
+        endif
+    endif   
+    return
+endfun remove_key
+//
+// Remove the key present in position pindx in
+// this node which is a leaf
+function removeFromLeaf parameters pindx of type integer, node pointer of type BTreeNode
+is
+variables
+    define i of type integer
+begin
+
+    // Move all the keys after position pindx one place backward
+    for i = pindx+1 to node->numkeys-1 do 
+        set node->keys[i-1] = node->keys[i]
+    endfor
+    // Reduce the count of keys
+    decrement node->numkeys
+    return
+endfun removeFromLeaf
+//
+
+// Remove the key in position pindx in
+// this node, a non-leaf node
+function removeFromNonLeaf parameters pindx of type integer, node pointer of type BTreeNode
+is
+variables
+    define lkey of type integer
+    define pred of type integer // index of predecessor key
+    define succ of type integer // index of sucessor
+structures
+    define lchild pointer of type BTreeNode     
+begin
+    set lkey = node->keys[pindx]
+
+    // If the child that precedes lkey (Child[pindx]) has at least mindeg keys,
+    // find the predecessor 'pred' of lkey in the subtree rooted at
+    // C[idx]. Replace lkey by pred. Recursively delete pred
+    // in Child[pindx]
+    set lchild = node->Child[pindx]
+    if lchild->numkeys >= node->mindeg then
+        set pred = getPred (pindx, node)
+        set node->keys[pindx] = pred
+        call remove_key using pred, node->Child[pindx] 
+
+    // If the child Child[pindx] has less that t keys, examine C[idx+1].
+    // If C[idx+1] has atleast t keys, find the successor of lkey in
+    // the subtree rooted at Child[pindx+1]
+    // Replace pkey by succ
+    // Recursively delete succ in Child[idx+1]
+    else 
+       set lchild = node->Child[pindx+1]
+       if  lchild->numkeys >= node->mindeg then
+    
+         set succ = getSucc (pindx, node)
+         set node->keys[pindx] = succ
+         call remove_key using succ, node->Child[pindx+1]
+       
+       else
+          call merge using pindx, node
+          call remove_key using lkey, node->Child[pindx]
+       endif
+    endif
+    return
+endfun removeFromNonLeaf
+//
+// Get the predecessor of the key in the position pindx in the node
+function getPred return type integer parameters pindx of type integer, node pointer of type BTreeNode
+is 
+structures 
+    define current pointer of type BTreeNode
+begin   
+    // Keep moving to the right most node until it reaches a leaf
+    set current = node->Child[pindx]
+    while current->leaf not equal true do
+         set current = current->Child[current->numkeys]
+    endwhile
+    // Return the last key of the leaf
+    return current->keys[current->numkeys-1]
+endfun getPred
+//
+// Get the successor of the key in position pindx in the node
+function getSucc return type integer parameters pindx of type integer, 
+     node pointer of type BTreeNode is
+structures
+    define current pointer of type BTreeNode
+begin
+    // Keep moving the left most node starting from C[idx+1] until we reach a leaf
+    set current = node->Child[pindx+1]
+    while current->leaf not equal true do
+        set current = current->Child[0]
+    endwhile
+    // Return the first key of the leaf
+    return current->keys[0]
+endfun getSucc
+//
+// Fill up the child node present in position pindx in array Child[] 
+//    if that child has less than mindeg-1 keys
+function fill parameters pindx of type integer, node pointer of type BTreeNode
+is 
+structures
+    define lchild pointer of type BTreeNode
+begin
+    // If the previous child(C[idx-1]) has more than mindeg-1 keys, borrow a key
+    // from that child
+    set lchild = node->Child[pindx-1]
+    if pindx not equal 0 and lchild->numkeys >= node->mindeg then
+         call borrowFromPrev using pindx, node
+   
+    // If the next child(C[idx+1]) has more than mindeg-1 keys, borrow a key
+    // from that child
+    else 
+         set lchild = node->Child[pindx+1]
+         if pindx not equal node->numkeys and lchild->numkeys >= node->mindeg then
+              call borrowFromNext using pindx, node
+
+         // Merge C[idx] with its sibling
+         // If C[idx] is the last child, merge it with its previous sibling
+         // Otherwise merge it with its next sibling
+         
+         else    
+            if pindx not equal node->numkeys then
+                call merge using pindx, node
+            else
+                call merge using pindx-1, node
+            endif   
+         endif       
+    endif
+    return
+endfun fill
+//
+// Borrow a key from node at Child[pindx-1] and move
+//  to Child[pindx] node
+function borrowFromPrev parameters pindx of type integer, node pointer of type BTreeNode
+is
+variables 
+    define i of type integer
+structures
+    define child pointer of type BTreeNode
+    define sibling pointer of type BTreeNode
+begin
+    set child = node->Child[pindx]
+    set sibling = node->Child[pindx-1]
+
+    // The last key from Child[pindx-1] goes up to the parent and key[pindx-1]
+    // from parent is inserted as the first key in Child[pindx]. 
+
+    // Moving all key in Child[pindx] one step ahead
+    set i = child->numkeys - 1
+    while i >= 0 do
+         set child->keys[i+1] = child->keys[i]
+         decrement i
+    endwhile
+    // If Child[pindx] is not a leaf, move all its child pointers one step ahead
+    if  child->leaf not equal true then
+           set i = child->numkeys
+           while i >= 0 do
+               set child->Child[i+1] = child->Child[i]
+               decrement i
+           endwhile
+    endif
+    // Setting child's first key equal to keys[pindx-1] from the current node
+    set child->keys[0] = node->keys[pindx-1]
+
+    // Moving sibling's last child as Child[pindx]'s first child
+    if child->leaf not equal true then   
+            set child->Child[0] = sibling->Child[sibling->numkeys]
+    endif
+    // Moving the key from the sibling to the parent
+    // This reduces the number of keys in the sibling
+    set node->keys[pindx-1] = sibling->keys[sibling->numkeys-1]
+
+    increment child->numkeys
+    decrement sibling->numkeys
+    return
+endfun borrowFromPrev
+//
+// Borrow a key from node in Child[pindx+1] and move
+// to node at Child[pindx]
+
+function borrowFromNext parameters pindx of type integer , node pointer of type BTreeNode
+is
+variables 
+    define i of type integer
+structures
+    define lchild pointer of type BTreeNode
+    define lsibling pointer of type BTreeNode
+begin
+    set lchild = node->Child[pindx]
+    set lsibling = node->Child[pindx+1]
+
+    // keys[pindx] is inserted as the last key in Child[pindx]
+    set i = lchild->numkeys
+    set lchild->keys[i] = node->keys[pindx]
+
+    // Sibling's first child is inserted as the last child
+    // into Child[pindx]
+    if  lchild->leaf not equal true then
+         set i = lchild->numkeys + 1
+         set lchild->Child[i] = lsibling->Child[0]
+    endif
+    set node->keys[pindx] = lsibling->keys[0]
+
+    // Moving all keys in sibling one step behind
+    for i=1 to lsibling->numkeys - 1 do
+         set lsibling->keys[i-1] = lsibling->keys[i]
+    endfor
+    // Moving the child pointers one step behind
+    if  lsibling->leaf not equal true then
+        for i = 1 to lsibling->numkeys -1 do
+            set lsibling->Child[i-1] = lsibling->Child[i]
+        endfor
+    endif
+    increment lchild->numkeys
+    decrement lsibling->numkeys
+    return
+endfun borrowFromNext
+//
+// Merge child pindx of the node with child pindx+1 of
+// the node
+function merge parameters pindx of type integer, node pointer of type BTreeNode
+is
+variables
+    define i of type integer
+structures
+    define lchild pointer of type BTreeNode
+    define lsibling pointer of type BTreeNode
+begin   
+    set lchild = node->Child[pindx]
+    set lsibling = node->Child[pindx+1]
+
+    // Pulling a key from the current node and inserting it into position (mindeg-1)
+    //  of Child[pindx]
+    set lchild->keys[node->mindeg-1] = node->keys[pindx]
+
+    // Copying the keys from C[idx+1] to C[idx] at the end
+    for i = 0 to lsibling->numkeys - 1 do
+         set lchild->keys[i+node->mindeg] = lsibling->keys[i]
+    endfor
+
+    // Copying the child pointers 
+    if lchild->leaf not equal true then
+          for i = 0 to lsibling->numkeys do
+              set lchild->Child[i+node->mindeg] = lsibling->Child[i]
+          endfor
+    endif
+    // Moving all keys after idx in the current node one step before -
+    // to fill the gap created by moving keys[idx] to C[idx]
+    for i = pindx + 1 to node->numkeys - 1 do
+          set node->keys[i-1] = node->keys[i]
+    endfor
+    // Moving the child pointers after (idx+1) in the current node one
+    // step before
+    for i = pindx + 2 to node->numkeys do
+         set node->Child[i-1] = node->Child[i]
+    endfor
+    // Updating the key count of child and the current node
+    set lchild->numkeys = lchild->numkeys + lsibling->numkeys + 1
+    decrement node->numkeys
+
+    // Freeing the memory occupied by sibling
+    call free using lsibling
+    return
+endfun merge
+//
+
+// Implementation of B-Tree functions
+
+// Insert a new key in this B-Tree
+function insert parameters pkey of type integer, tree pointer of type BTree
+is
+variables
+    define i of type integer
+structures
+    define tnode pointer of type BTreeNode
+begin
+    // If tree is empty
+    if tree->root equal NULL then
+        // create new node
+        create tree->root type BTreeNode
+        call BTreeNode_init using tree->mindeg, true, tree->root
+        set tree->root->keys[0] = pkey  // Insert key
+        set tree->root->numkeys = 1  // Update number of keys in root
+    else 
+        // If tree is not empty
+        // If root is full, then tree grows in height
+        
+        if tree->root->numkeys equal 2*tree->mindeg-1 then  
+            // Allocate memory for new root           
+            create tnode type BTreeNode
+            call BTreeNode_init using tree->mindeg, false, tnode
+            // Make old root as child of new root
+            set tnode->Child[0] = tree->root
+
+            // Split the old root and move 1 key to the new root
+            call splitChild using 0, tree->root, tnode
+
+            // New root has two children now.  Decide which of the
+            // two children is going to have new key
+            set i = 0
+            if tnode->keys[0] < pkey then
+                increment i
+            endif               
+            call insertNonFull using pkey, tnode->Child[i]
+            // Change root
+            set tree->root = tnode         
+         else  
+            // If root is not full, call insertNonFull for root
+            call insertNonFull using pkey, tree->root         
+         endif
+         
+    endif
+endfun insert
+//
+// Initialize tree
+function BTree_init parameters pmindeg of type integer, tree pointer of type BTree is
+begin
+         set tree->root = NULL
+         set tree->mindeg = pmindeg
+endfun BTree_init
+//
+// tree traverse
+function ttraverse parameters tree pointer of type BTree is
+begin
+        if tree->root not equal NULL then
+            call traverse using tree->root
+        endif
+endfun ttraverse
+//
+// search a key in this tree
+function tsearch return pointer of type BTreeNode parameters
+    pkey of type integer, tree pointer of type BTree is
+begin
+        if  tree->root equal NULL then
+           return NULL
+        else
+           return search( pkey, tree->root)
+        endif
+endfun tsearch
+//
+// Auxiliary function to insert a new key in the subtree rooted with
+// this node. The node must be non-full 
+function insertNonFull parameters pkey of type integer, node pointer of type BTreeNode
+is
+variables
+    define i of type integer
+structures
+    define tnode pointer of type BTreeNode  
+begin   
+    // Initialize index as index of rightmost element
+    set i = node->numkeys - 1
+
+    // If this is a leaf node
+    if node->leaf equal true then    
+        // The following loop:
+        // a) Finds the location of new key to be inserted
+        // b) Moves all greater keys to one place ahead
+        while i >= 0 and node->keys[i] > pkey do        
+            set node->keys[i+1] = node->keys[i]
+            decrement i
+        endwhile
+
+        // Insert the new key at location found
+        set node->keys[i+1] = pkey
+        set node->numkeys = node->numkeys+1    
+    else 
+        // If this node is not leaf    
+        // Find the child which is going to have the new key
+        while i >= 0 and node->keys[i] > pkey do
+            decrement i 
+        endwhile
+        // check whether the child found is full
+        set tnode = node->Child[i+1]
+        if tnode->numkeys equal (2 * node->mindeg - 1) then
+             // If the child is full, then split it
+             call splitChild using i+1, node->Child[i+1], node
+
+            // After split, the middle key of Child[i] moves up and
+            // Child[i] is split into two.  Find which of the two
+            // is going to have the new key
+            if node->keys[i+1] < pkey then
+                increment i
+            endif
+        endif
+        call insertNonFull using pkey, node->Child[i+1]
+    endif
+endfun insertNonFull
+//
+// Auxiliary function to split the pchild of this node. 
+// The Child must be full 
+function splitChild parameters pindx of type integer, 
+    pchild pointer of type BTreeNode, node pointer of type BTreeNode
+is
+variables
+    define j of type integer
+structures 
+    define tnode    pointer of type BTreeNode
+begin   
+    // Create a new node which is going to store (t-1) keys
+    // of pchild
+    create tnode type BTreeNode
+    call BTreeNode_init using pchild->mindeg, pchild->leaf, tnode    
+    set tnode->numkeys = node->mindeg - 1
+    // Copy the last (mindeg-1) keys of pchild to tnode
+    for j = 0 to node->mindeg-2 do
+         set tnode->keys[j] = pchild->keys[j+pchild->mindeg]
+    endfor  
+    // Copy the last mindeg children of pchild to tnode
+    if pchild->leaf equal false then    
+        for j = 0 to node->mindeg - 1 do
+              set tnode->Child[j] = pchild->Child[j+node->mindeg]
+        endfor
+    endif   
+    // Reduce the number of keys in pchild
+    set pchild->numkeys = node->mindeg - 1
+    // Since this node is going to have a new child,
+    // create space of new child
+    set j = node->numkeys
+    while j >= pindx + 1  do 
+        set node->Child[j+1] = node->Child[j]
+        decrement j
+    endwhile
+    // Link the new child to this node
+    set node->Child[pindx+1] = tnode
+
+    // A key of pchild will move to this node. Find location of
+    // new key and move all greater keys one space ahead
+    set j = node->numkeys - 1
+    while j >= pindx  do 
+        set node->keys[j+1] = node->keys[j]
+        decrement j
+    endwhile
+    // Copy the middle key of y to this node
+    set node->keys[pindx] = pchild->keys[node->mindeg-1]
+
+    // Increment count of keys in this node
+    set node->numkeys = node->numkeys + 1   
+endfun splitChild
+//
+// Traverse all nodes in a subtree rooted with this node
+function traverse parameters node pointer of type BTreeNode
+is
+variables 
+    define i of type integer
+    define numk of type integer
+begin   
+    // There are n keys and n+1 children, traverse through n keys
+    // and first n children   
+    for i = 0  to node->numkeys - 1 do    
+        // If this is not leaf, then before printing key[i],
+        // traverse the subtree rooted with child C[i].
+        if node->leaf equal false then
+             call traverse using node->Child[i]
+        endif
+        set numk = node->keys[i]
+        display "  ", numk
+    endfor
+
+    // Print the subtree rooted with last child
+    if  node->leaf equal false then
+         call traverse using node->Child[i]
+    endif
+endfun traverse
+//
+// Search a key in subtree rooted with this node.
+function search return pointer of type BTreeNode parameters
+     pkey of type integer, node pointer of type BTreeNode
+is
+variables
+    define i of type integer
+begin   
+    // Find the first key greater than or equal to k
+    set i = 0
+    while i < node->numkeys and pkey > node->keys[i] do
+         increment i
+    endwhile
+
+    if node->keys[i] equal pkey then
+        return node
+    endif
+    // If key is not found here and this is a leaf node
+    if node->leaf equal true then
+        return NULL
+    endif
+    // Go to the appropriate child
+    return search(pkey, node->Child[i])
+endfun search
+//
+// Remove a new key from thie B-Tree
+function tremove parameters pkey of type integer, tree pointer of type BTree
+is
+structures 
+    define tnode pointer of type BTreeNode
+begin
+    if tree->root equal NULL then    
+        display "The tree is empty\n"
+        return
+    endif
+    
+    call remove_key using pkey, tree->root
+
+    // If the root node has 0 keys, make its first child as the new root
+    //  if it has a child, otherwise set root as NULL
+    if tree->root->numkeys equal 0 then
+        set tnode = tree->root
+        if tree->root->leaf equal true then
+            set tree->root = NULL
+        else
+            set tree->root = tree->root->Child[0]
+        endif
+        // Free the old root
+        call free using tnode
+    endif
+    return
+endfun tremove
+
+// Program to test B-tree functions
+function main is
+structures
+    define tree pointer of type BTree 
+begin   
+    // create and initialize a B-tree with minimum degree 3
+    create tree type BTree
+    call BTree_init using 3, tree
+    
+    // Insert keys to B-tree
+    call insert using 1, tree
+    call insert using 3,tree
+    
+    call insert using 7,tree
+    
+    call insert using 10, tree
+    call insert using 11, tree
+    call insert using 13, tree
+    
+    call insert using 14, tree
+    call insert using 15, tree
+    
+    call insert using 18, tree
+    
+    call insert using 16, tree 
+    call insert using 9, tree
+    call insert using 24, tree 
+    call insert using 25, tree 
+    call insert using 26, tree
+    call insert using 21, tree
+    call insert using 4, tree
+    call insert using 5, tree
+    
+    call insert using 20, tree
+    call insert using 22, tree
+    call insert using 2, tree
+    call insert using 17, tree
+    call insert using 12, tree
+    call insert using 6, tree
+
+    display "Traversal of B-tree after inserting keys\n"
+    call ttraverse using tree
+    display "\n"
+
+    // remove specified keys from the B-tree
+    call tremove using 6, tree
+    display "Traversal of B-tree after removing key 6\n"
+    call ttraverse using tree
+    display "\n"
+
+
+    call tremove using 13, tree
+    display "Traversal of B-tree after removing key 13\n"
+    //call ttraverse using tree
+    //display "\n"
+
+
+    call tremove using 27, tree
+    display "Traversal of B-tree after removing key 27\n"
+    call ttraverse using tree
+    display "\n"
+
+/*
+    tremove(4, t);
+    printf( "Traversal of B-tree after removing key 4\n");
+    ttraverse(t);
+    printf ("\n");
+
+
+    tremove(2, t);
+    printf("Traversal of B-tree after removing key 2\n");
+    ttraverse(t);
+    printf ("\n");
+
+
+    tremove(16, t);
+    printf("Traversal of B-tree after removing key 16\n");
+    ttraverse(t);
+    printf ("\n");
+
+*/
+    return 0
+endfun main
+
+ 

@@ -1,0 +1,87 @@
+// Implementation of a simple graph
+// using an adjacency matrix
+
+import <stdio.h>
+import "scl.h"
+
+global declarations
+  
+// Graph with N vertices and M Edges
+variables
+    define N of type integer
+    define M of type integer
+ 
+ implementations
+  
+// Create Adjacency Matrix
+function createAdjMatrix parameters Adj array [] [N + 1] of type integer,
+    edge array [][2] of type integer
+is
+variables
+    define j of type integer
+    define k of type integer
+    define i of type integer
+begin    
+    // Initialise Adjacency matrix
+    for i = 0 to N do 
+        for j = 0 to N do 
+            set Adj[i][j] = 0
+        endfor
+    endfor
+  
+    // Setup Edges in matrix
+    display "Edges: \n"
+    for i = 0 to M-1 do
+  
+        // Edges
+        set j = edge[i][0]
+        set k = edge[i][1]
+        display j," ", k
+        // Set matrix element 
+        set Adj[j][k] = 1
+        set Adj[k][j] = 1
+    endfor
+endfun createAdjMatrix
+ 
+//
+// Function to print the created
+// Adjacency Matrix
+function displayAdjMatrix parameters Adj array [][N + 1] of type integer
+is
+variables
+    define i of type integer
+    define j of type integer
+begin
+    display "Adjacency matrix: \n"
+    // Traverse matrix Adj[][]
+    for  i = 1 to N   do
+        for j = 1 to N  do         
+            display " ", Adj[i][j]      // Display element at i, j
+        endfor
+        display "\n"
+    endfor
+endfun displayAdjMatrix
+ 
+// Driver function
+// for defining and processing a simple graph
+function main is
+variables
+    // Adjacency Matrix
+    define Adj array [N + 1][N + 1] of type integer
+    define edge array [][2] of type integer = { { 1, 2 }, { 2, 3 }, 
+                                                { 4, 5 }, { 1, 5 } }
+begin
+    // Number of vertices
+    set N = 5
+    // Number of Edges
+    set M = sizeof(edge) / sizeof(edge[0])
+  
+    // Create Adjacency Matrix
+    call createAdjMatrix using Adj, edge
+  
+    // Display Adjacency Matrix
+    call displayAdjMatrix using Adj
+  
+    return 0
+endfun main
+

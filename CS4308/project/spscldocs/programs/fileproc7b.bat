@@ -1,0 +1,1 @@
+gcc file_proc7b.c -o filep7b.exe indxsF2.o libpbl.a

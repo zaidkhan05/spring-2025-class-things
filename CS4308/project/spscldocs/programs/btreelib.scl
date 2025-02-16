@@ -1,0 +1,287 @@
+
+import "btreeh.c"
+/* File: btreelib.c
+  This is the implementation of functions for
+  binary trees.
+  J. M. Garrido Feb 2021
+
+***  Note: the programmer (user) needs to define a 
+  data structure with name 'Datablock' 
+*/  
+implementations 
+
+function init_tree return pointer of type btreeT parameters 
+    maxn of type integer, pname pointer of type char 
+is
+structures 
+   define ptree pointer of type btreeT
+begin
+   create ptree type btreeT
+   set ptree->Root = NULL 
+   set ptree->numnodes = 0
+   set ptree->maxnodes = maxn
+   call strcpy using ptree->lname, pname
+   return ptree
+endfun init_tree
+//
+function build_tree return of type NodePtr
+    parameters ptree pointer of type btreeT   
+is
+variables
+   define k of type integer
+   define n of type integer
+   define lkeyval of type integer
+   define lnum of type integer
+structures
+   define pdata pointer of type DataT
+   define proot of type NodePtr
+   define tnode of type NodePtr
+begin
+   input "Enter number of nodes to input: ", k
+   set proot = null
+   for n = 1 to k do
+     // create pdata type DataT
+     set pdata = get_data()  // data from input
+     set lkeyval = keyval of pdata
+     set lnum = nodenum of pdata
+     display " keyval: ", lkeyval
+     display " numn: ", lnum     
+
+     set tnode = insert_node ( proot, pdata )
+     
+     if n equal 1 then           // Node 1
+        set Root of ptree = tnode     // root of tree 
+     endif
+     set proot = tnode
+   endfor
+   set numnodes of ptree = k
+   return Root of ptree
+endfun build_tree 
+//
+function insert_node return type NodePtr parameters proot of type NodePtr,
+      pdata pointer of type DataT
+is
+variables
+    define lkval of type integer
+    define lnum of type integer
+    define rkval of type integer
+    define rnum of type integer
+structures
+    define tnode of type NodePtr
+    define rdata pointer of type DataT
+begin
+  // display "(insert_node) "
+  // Construct a binary tree in preorder 
+  if proot equal null then
+     display "(insert_node) root is null"
+     create tnode type NodeType
+     //
+     set datablock of tnode = pdata
+     set left of tnode = NULL
+     set right of tnode = NULL
+     set proot = tnode
+     //
+     return tnode
+  endif 
+  set rdata = datablock of proot   // of root node
+  set rkval = keyval of rdata
+  set rnum = nodenum of rdata
+  set lkval = keyval of pdata       // of current node
+  set lnum = nodenum of pdata
+  display "(insert_node) lkval: ", lkval
+  display "(insert_node) lnum: ", lnum
+  display "(insert_node) rkval: ", rkval
+  if lkval < keyval of rdata  then
+        // display "(insert_node) left subtree"
+        set left of proot = insert_node ( left of proot, pdata)
+  else
+        // display "(insert_node) right subtree"
+        set right of proot = insert_node ( right of proot, pdata )
+  endif
+  return proot
+endfun insert_node
+//
+//
+// get node data from input
+function get_data return pointer of type DataT
+is
+variables
+    define mkey of type integer
+    define mnode of type integer
+structures
+    define ldatab pointer of type DataT   
+begin
+     input "Enter node key value: ", mkey
+     input "Enter node number: ", mnode
+     create ldatab type DataT
+     set keyval of ldatab = mkey
+     set nodenum of ldatab = mnode   // node number
+     return ldatab  
+endfun get_data
+//
+function preOrder_display parameters root of type NodePtr
+is
+variables
+    define lkeyval of type integer
+    define node_num of type integer
+structures
+    define pdata pointer of type DataT
+begin
+  // traverse a binary tree in preorder
+  // display "(preOrder_display) "
+  if root not equal NULL then
+     // get data in node
+     set pdata = datablock of root    // data from node
+     set node_num = nodenum of pdata
+     set lkeyval = keyval of pdata
+     display "(preOrder display) key value: ", lkeyval
+     display "(preOrder display) number: ", node_num
+     //
+     // continue recursively to left and right subtrees
+     call preOrder_display using left of root
+     call preOrder_display using right of root
+  else
+     display "root ptr is null"
+     return
+  endif
+endfun preOrder_display
+//
+function empty_list return type bool parameters 
+  ptree pointer of type btreeT   
+is
+begin
+   if Root of ptree equal NULL or numnodes of ptree equal 0
+   then
+      return true
+   else
+      return false
+   endif
+endfun empty_list
+//
+function full_list return type bool parameters 
+  ptree pointer of type btreeT 
+is
+begin
+   if numnodes of ptree < maxnodes of ptree then 
+      return false
+   else
+      return true
+   endif
+endfun full_list
+//
+function listSize return type integer
+   parameters ptree pointer of type btreeT
+is
+begin
+   return numnodes of ptree
+endfun listSize
+//
+function destroy_tree parameters Root of type NodePtr
+// destroy a tree given its root node
+is
+begin
+  if Root not equal NULL then
+      call destroy_tree using left of Root
+      call destroy_tree using right of Root
+      destroy Root
+  endif
+endfun destroy_tree
+//
+description
+  This function deletes a node given its key value from a binary search key.
+*/
+function deleteNode 
+    parameters Root of type NodePtr, keyval of type integer
+is
+variables
+   define rkeyval of type integer
+   define tkey of type integer
+structures
+   define tnode of type NodePtr
+   define rdata pointer of type DataT
+   define tdata pointer of type DataT
+begin
+  if Root not equal NULL then 
+     set rdata = datablock of Root    // data from root
+     set rkeyval = keyval of rdata
+  endif  
+  if Root equal NULL then
+     display "root is empty; key not found" 
+  elseif keyval < rkeyval then
+     call deleteNode using left of Root, keyval
+  elseif keyval > rkeyval then
+     call deleteNode using right of Root, keyval
+  elseif left of Root not equal NULL and 
+        right of Root not equal NULL then
+     set tnode = findLargestKey(left of Root) 
+     
+     set tdata = datablock of tnode
+     set tkey = keyval of tdata
+     set rkeyval = tkey
+     call deleteNode using left of Root, tkey
+  else
+     set tnode = Root
+     if left of Root equal NULL and right of Root equal NULL then
+         set Root = NULL
+     elseif left of Root not equal NULL then
+         set Root = left of Root
+     else
+         set Root = right of Root
+     endif
+     destroy tnode
+  endif
+endfun deleteNode
+//
+function findLargestKey return type NodePtr
+     parameters Root of type NodePtr is
+begin 
+    if Root equal NULL or right of Root equal NULL  then
+       return Root
+    else
+       return findLargestKey (right of Root)
+    endif
+endfun findLargestKey
+//
+description
+  This functions searches for a node with the given key value
+*/
+function searchKey return type NodePtr 
+   parameters Root of type NodePtr, keyval of type integer
+is
+variables
+   define rkeyval of type integer
+structures
+   define rdata pointer of type DataT
+begin
+  set rdata = datablock of Root    // data from root
+  set rkeyval = keyval of rdata
+  if rkeyval equal keyval or Root equal NULL then
+      return Root
+  elseif keyval < rkeyval then
+      return searchKey (left of Root, keyval)
+   else
+      return searchKey (right of Root, keyval)
+   endif
+endfun searchKey
+//
+function height_tree return type integer 
+   parameters Root of type NodePtr
+is
+variables
+   define leftH of type integer
+   define rightH of type integer
+begin
+   if Root equal NULL then
+      return 0
+   else
+      set leftH = height_tree(left of Root)
+      set rightH = height_tree(right of Root)
+      if leftH > rightH then
+          return leftH + 1
+      else
+          return rightH + 1
+      endif
+   endif
+endfun height_tree
+
+ 

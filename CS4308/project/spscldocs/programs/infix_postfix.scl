@@ -1,0 +1,190 @@
+description
+ This program converts an infix formula to a postfix
+  formula. The infix formula has been edited to ensure
+  that there are no syntactical errors.
+  J. Garrido. Updated July 2022
+  */
+import "scl.h"
+import "stackh.c"
+
+symbol EOL 0Ah
+
+specifications
+
+struct Datablock is
+     define stdata of type char
+endstruct Datablock
+
+definetype struct Datablock DataT
+
+forward declarations
+    // Prototype Declarations
+function priority return type integer
+    parameters term of type char
+
+function isOperator return type bool
+    parameters term of type char
+
+function pushStack parameters mstack pointer of type stackType,
+     pterm of type char
+
+function popStack return type char  parameters
+     mstack pointer of type stackType
+
+function StackTop return type char parameters
+     mstack pointer of type stackType
+
+implementations
+
+function main is
+ variables
+    define postfix array [80] of type char
+    define temp array [2] of type char
+    define term of type char
+	define term2 of type char
+    define dataPtr pointer of type char
+	define truth of type bool
+	define prio1 of type integer
+	define prio2 of type integer
+ structures
+     define dblock pointer of type DataT
+     define mstacka of type stackType
+     define stackp pointer of type stackType
+     define nodePtr of type NodePtr
+ begin 
+   // set temp[1] = ' '
+   set stackp = address mstacka
+   display "Starting prog "
+   call create_stack using stackp, 80, "stackA" // create empty stack
+   // read infix formula and parse char by char
+   input "Enter character: ", term
+   while term != EOL do
+       set truth = isOperator (term)
+       if term == '('   then
+          call pushStack using stackp, term
+       elseif term == ')' then
+          set term2 = popStack (stackp)
+          while term2 != '(' do
+             set temp [0]= term2
+             call strcat using postfix, temp
+             set term2 = popStack (stackp)
+          endwhile 
+       elseif truth == true then
+          // test priority of term at stack top
+          set term2 = StackTop (stackp)		  
+          set prio1 = priority (term)
+		  set prio2 = priority (term2)
+          while not sEmpty (stackp) and prio1 <= prio2 do
+             // (priority (term) <= priority (term2))   
+             set term2 = popStack (stackp)
+             set temp [0] = term2
+             call strcat using postfix, temp
+             set term2 = StackTop (stackp)
+          endwhile
+          set term2 = term
+		  call pushStack using stackp, term2
+       else    // character is operand 66      {
+          set temp[0]= term
+          call strcat using postfix, temp
+       endif
+	   input "Enter character: ", term
+    endwhile 
+
+    // Infix formula empty. Pop stack to postfix
+    while ! sEmpty (stackp) == true do       
+        set term2 = popStack (stackp)
+        set temp[0] = term2
+        call strcat using postfix, temp
+    endwhile
+   // display the postfix expression
+   display "The postfix expression is: " 
+   display postfix
+
+   // Now destroy the stack 
+   destroy stackp
+   return 0
+endfun main
+//
+
+/* 
+Get priority of operator.
+Pre term is a valid operator Post term priority returned
+*/
+function priority return type integer 
+   parameters term of type char 
+is
+begin
+   if term == '*' or term == '/' then 
+      return 2
+   endif
+   if term == '+' or term == '-' then 
+      return 1
+   endif
+   return 0
+endfun priority
+//
+/*
+Determine if term is an operator. Pre   term is a valid operator
+Post return true if operator; false if not
+*/
+function isOperator return type bool
+   parameters term of type char
+is
+begin
+   if term == '*'
+      or term == '/'
+      or term == '+'
+      or term == '-' then 
+     return true
+   else
+     return false
+   endif 
+endfun isOperator     
+//
+function pushStack parameters mstack pointer of type stackType,
+     pterm of type char is
+ structures
+     define ldatab pointer of type DataT
+	 define nodePtr of type NodePtr
+begin
+    // allocate memory for datablock
+    create ldatab type DataT
+	set ldatab->stdata = pterm
+	create nodePtr type NodeType 
+    set nodePtr->datablock = ldatab
+    call push using mstack, nodePtr
+	return
+endfun pushStack
+//
+function popStack return type char  parameters 
+     mstack pointer of type stackType is
+variables
+    define ldata of type char
+structures
+	define nodePtr of type NodePtr
+	define dblock pointer of type DataT
+begin
+    // display "Pop from stack: "
+    set nodePtr = pop(mstack)
+    set dblock = nodePtr->datablock
+	set ldata = dblock->stdata
+    destroy dblock
+    return ldata
+endfun popStack
+//
+function StackTop return type char parameters 
+     mstack pointer of type stackType is
+variables
+    define ldata of type char
+structures
+	define nodePtr of type NodePtr
+	define dblock pointer of type DataT	
+begin
+    // display "Top of stack: "
+    set nodePtr = top(mstack)
+    set dblock = nodePtr->datablock
+	set ldata = dblock->stdata
+    destroy dblock
+    return ldata
+endfun StackTop
+

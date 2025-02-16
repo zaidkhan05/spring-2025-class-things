@@ -1,0 +1,63 @@
+
+description
+  File: stack.scl
+  This is the implementation of functions for
+  a stack using single-linked list with  data blocks.
+  J. M. Garrido Feb 2022
+***  Note: the programmer (user) needs to define a 
+  data structure with name 'Datablock' 
+*/	
+import "stackh.c"
+
+implementations
+
+function create_stack parameters stack pointer of type stackType,
+    maxn of type integer,  sname pointer of type char
+is
+begin
+   call init_list using stack, maxn, sname
+endfun create_stack
+//
+function push parameters stack pointer of type stackType,
+    pnode of type NodePtr
+is
+begin
+
+   call insert_front using stack, pnode
+endfun push
+//
+ function pop return type NodePtr parameters
+     stack pointer of type stackType  
+is
+begin
+    return remove_front(stack)
+endfun pop
+//
+function top return type NodePtr parameters
+     stack pointer of type stackType
+is
+begin
+   // get data from top of stack
+   return get_front(stack)
+endfun top
+//
+function sEmpty return type bool parameters stack pointer of type stackType
+is
+begin
+   return empty_list (stack) 
+endfun sEmpty
+//
+function sFull return type bool parameters stack pointer of type stackType
+is
+begin
+   return full_list (stack)
+endfun sFull
+//
+function stackSize return type integer parameters
+     stack pointer of type stackType
+is
+begin
+   return stack->numnodes
+endfun stackSize
+
+

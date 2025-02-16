@@ -1,0 +1,23 @@
+import "scl.h"
+
+implementations
+
+function main is
+constants 
+    define MAXNUM of type integer = 15
+variables
+    define j of type integer  // loop counter
+    define innumber of type float
+    define sum of type float
+begin   
+    set sum = 0.0       // initialize accumulator variable                
+    for j = 1 to j <= MAXNUM do
+       // display "Type number: ", j     
+       input "Type number: ", innumber
+       if innumber > 0.0
+       then
+          add innumber to sum
+       endif
+    endfor
+    display "Value of sum: ", sum
+endfun main 

@@ -4,13 +4,11 @@ class ComplexNumber {
     private double real;
     private double imaginary;
 
-    // Constructor
     public ComplexNumber(double real, double imaginary) {
         this.real = real;
         this.imaginary = imaginary;
     }
 
-    // Getter methods
     public double getReal() {
         return real;
     }
@@ -31,6 +29,7 @@ class ComplexNumber {
 
     // Multiplication
     public ComplexNumber multiply(ComplexNumber other) {
+        //hehe foil
         double realPart = this.real * other.real - this.imaginary * other.imaginary;
         double imaginaryPart = this.real * other.imaginary + this.imaginary * other.real;
         return new ComplexNumber(realPart, imaginaryPart);
@@ -38,6 +37,7 @@ class ComplexNumber {
 
     // Division
     public ComplexNumber divide(ComplexNumber other) {
+        //complex conjugate thing
         double denominator = other.real * other.real + other.imaginary * other.imaginary;
         if (denominator == 0) {
             throw new ArithmeticException("Division by zero is not allowed.");
@@ -56,34 +56,35 @@ class ComplexNumber {
 
 public class assn1 {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
 
-        // Input for first complex number
-        System.out.print("Enter the real part of the first complex number: ");
-        double real1 = scanner.nextDouble();
+       Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter the imaginary part of the first complex number: ");
-        double imaginary1 = scanner.nextDouble();
-        ComplexNumber num1 = new ComplexNumber(real1, imaginary1);
+       //complex number 1
+       System.out.print("Enter the real part of the first complex number: ");
+       double real1 = scanner.nextDouble();
 
-        // Input for second complex number
-        System.out.print("Enter the real part of the second complex number: ");
-        double real2 = scanner.nextDouble();
-        System.out.print("Enter the imaginary part of the second complex number: ");
-        double imaginary2 = scanner.nextDouble();
-        ComplexNumber num2 = new ComplexNumber(real2, imaginary2);
+       System.out.print("Enter the imaginary part of the first complex number: ");
+       double imaginary1 = scanner.nextDouble();
+       ComplexNumber num1 = new ComplexNumber(real1, imaginary1);
 
-        // Perform operations
-        System.out.println("\nResults:");
-        System.out.println("Addition: " + num1.add(num2));
-        System.out.println("Subtraction: " + num1.subtract(num2));
-        System.out.println("Multiplication: " + num1.multiply(num2));
-        try {
-            System.out.println("Division: " + num1.divide(num2));
-        } catch (ArithmeticException e) {
-            System.out.println("Division: " + e.getMessage());
-        }
+       //complex number 2
+       System.out.print("Enter the real part of the second complex number: ");
+       double real2 = scanner.nextDouble();
+       System.out.print("Enter the imaginary part of the second complex number: ");
+       double imaginary2 = scanner.nextDouble();
+       ComplexNumber num2 = new ComplexNumber(real2, imaginary2);
 
-        scanner.close();
+       //do the thing
+       System.out.println("\nResults:");
+       System.out.println("Addition: " + num1.add(num2));
+       System.out.println("Subtraction: " + num1.subtract(num2));
+       System.out.println("Multiplication: " + num1.multiply(num2));
+       try {
+           System.out.println("Division: " + num1.divide(num2));
+       } catch (ArithmeticException e) {
+           System.out.println("Division: " + e.getMessage());
+       }
+
+       scanner.close();
     }
 }

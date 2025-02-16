@@ -1,0 +1,380 @@
+
+import "avlh.c"
+/* File: 2.c
+  This is the implementation of functions for
+ AVL trees.
+  J. M. Garrido Feb 2022
+*/  
+implementations 
+
+function init_tree return pointer of type avltreeT parameters 
+    maxn of type integer, pname pointer of type char 
+is
+structures 
+   define ptree pointer of type avltreeT
+begin
+   create ptree type avltreeT
+   set Root of ptree = NULL 
+   set numnodes of ptree = 0
+   set maxnodes of ptree = maxn
+   call strcpy using lname of ptree, pname
+   return ptree
+endfun init_tree
+// 
+// Get height
+function heightfun return type integer parameters 
+    pnode of type NodePtr is
+begin   
+   if pnode equal NULL then
+      return 0
+   else
+      return height of pnode
+   endif
+endfun heightfun
+
+function max return type integer parameters x of type integer,
+    y of type integer is
+begin
+  // return (a > b) ? a : b;
+  if x  > y then
+    return x
+  else 
+    return y
+  endif
+endfun max
+//
+// Create a node
+function newNode return type NodePtr parameters 
+    key of type integer 
+is
+structures
+  define node of type NodePtr
+begin
+  create node type NodeType
+  set keyval of node = key
+  set left of node = NULL
+  set right of node = NULL
+  set height of node = 1
+  return node
+endfun newNode
+//
+// Right rotate
+function rightRotate return type NodePtr parameters ynode of type NodePtr 
+is
+structures
+  define xnode of type NodePtr
+  define tnode of type NodePtr
+begin
+  set xnode = left of ynode
+  set tnode = right of xnode
+
+  set right of xnode = ynode
+  set left of ynode = tnode
+
+  set height of ynode = max(heightfun(left of ynode),
+      heightfun(right of ynode)) + 1
+  set height of xnode = max(heightfun(left of xnode),
+      heightfun(right of xnode)) + 1
+  // Return new root
+  return xnode
+endfun rightRotate
+//
+// Left rotate
+function leftRotate return type NodePtr parameters xnode of type NodePtr 
+is
+  structures 
+     define ynode of type NodePtr
+     define tnode of type NodePtr
+begin
+   set ynode = right of xnode
+   set tnode = left of ynode
+
+   set left of ynode = xnode
+   set right of xnode = tnode
+
+   set height of xnode = max(heightfun(left of xnode),
+        heightfun(right of xnode)) + 1
+   set height of ynode = max(heightfun(left of ynode),
+        heightfun(right of ynode)) + 1
+   return ynode
+endfun leftRotate
+//
+// Calculate the balance factor
+function getBalance return type integer parameters
+      pnode of type NodePtr
+is
+begin     
+   if pnode equal NULL then
+      return 0
+   endif      
+   return heightfun(left of pnode) - heightfun(right of pnode)
+endfun getBalance
+//
+// Insert node
+// Recursive function to insert a node with key in the subtree rooted
+// with node and returns the new root of the subtree.
+function insertNode return type NodePtr parameters
+   node of type NodePtr, keyval of type integer
+is
+variables
+   define balance of type integer
+structures
+   define tnode of type NodePtr
+   define leftnode of type NodePtr
+   define rightnode of type NodePtr
+begin
+   // Find the correct position to insertNode the node and insertNode it
+   // standard BST insertion 
+   if node equal NULL then
+      // create new node
+      set tnode = newNode(keyval)
+      return tnode
+   endif
+   if keyval < keyval of node then
+       set left of node = insertNode(left of node, keyval)
+   elseif keyval > keyval of node then
+       set right of node = insertNode(right of node, keyval)
+   else
+       return node
+   endif
+   
+   // Update the balance factor of each node 
+     
+   set height of node = 1 + max(heightfun(left of node),
+               heightfun(right of node))
+
+   // Get the balance factor of this ancestor
+   //    node to check unbalance
+   set balance = getBalance(node)
+   // 
+   // Four cases for rotation of nodes
+ 
+   // Left Left Case
+   //check left subtree
+   set leftnode = left of node
+   if balance > 1 and keyval < keyval of leftnode then
+        return rightRotate(node)
+   endif
+   
+   // Right Right Case
+   // check right subtree
+   set rightnode = right of node
+   if balance < -1 and keyval > keyval of rightnode then
+        return leftRotate(node)
+   endif
+   // Left Right Case
+   // check subtree
+   if balance > 1 and keyval > keyval of leftnode then
+         set left of node = leftRotate(left of node)
+         return rightRotate(node)
+   endif
+   // Right Left Case
+   // check right subtree
+   set rightnode =  right of node
+   if balance < -1 and keyval < keyval of rightnode then
+       set right of node = rightRotate(right of node)
+       return leftRotate(node)
+   endif 
+   // return the (unchanged) node pointer
+   return node
+endfun insertNode
+//
+// Display node keys of the tree
+function displayPreOrder parameters root of type NodePtr
+is
+variables
+    define tkey of type integer
+begin
+   if root not equal NULL then
+       set tkey = keyval of root
+       display "", tkey 
+       call displayPreOrder using left of root
+       call displayPreOrder using right of root
+   endif
+endfun displayPreOrder
+//
+function minKeyNode return type NodePtr parameters
+    node of type NodePtr 
+is
+structures  
+   define current of type NodePtr
+
+begin
+   set current = node
+   // check left subtree
+   while left of current not equal NULL do
+        set current = left of current
+   endwhile
+   return current
+endfun minKeyNode
+//
+function findLargestKey return type NodePtr
+     parameters Root of type NodePtr is
+begin 
+    if Root equal NULL or right of Root equal NULL  then
+       return Root
+    else
+       return findLargestKey (right of Root)
+    endif
+endfun findLargestKey
+//
+description
+  This function deletes a node given its key value from a binary search key. */
+function deleteNode2 return type NodePtr
+    parameters Root of type NodePtr, keyval of type integer
+is
+variables
+   define rkeyval of type integer
+   define tkey of type integer
+structures
+   define tnode of type NodePtr
+begin
+  if Root not equal NULL then 
+     set rkeyval = keyval of Root  
+  endif  
+  if Root equal NULL then
+     display "root is empty; key not found" 
+     return Root
+  elseif keyval < rkeyval then
+     set left of Root = deleteNode2(left of Root, keyval)
+  elseif keyval > rkeyval then
+     set right of Root = deleteNode2(right of Root, keyval)
+  //
+  // the key is the same as root's  
+  else 
+     if left of Root equal NULL then
+         set tnode = right of Root
+		 destroy Root
+		 return tnode
+		 
+	 elseif right of Root equal NULL then
+	       set tnode = left of Root
+		   destroy Root
+		   return tnode
+	 endif 
+	  
+	 // get node with minimum key in right subtree 
+	 set tnode = minKeyNode(right of Root) 
+     
+     set keyval of Root = keyval of tnode
+     set balance of Root = balance of tnode
+	 set height of Root = height of tnode
+	
+	 set right of Root = deleteNode2(right of Root, keyval of tnode)
+     
+  endif
+  return Root
+endfun deleteNode2
+
+// Delete a node from AVL tree
+function avldeleteNode return type NodePtr parameters
+   root of type NodePtr, pkey of type integer
+is
+variables
+   define balance of type integer
+structures  
+   define temp of type NodePtr
+begin
+  // First perform delete of node in BST
+  set root = deleteNode2 (root, pkey)
+    
+  if root equal NULL then
+      return root
+  endif
+  // Update the balance factor of each node and
+  // balance the tree
+  set height of root = 1 + max(heightfun(left of root),
+               heightfun(right of root))
+
+  set balance = getBalance(root)
+  if balance > 1 and getBalance(left of root) >= 0 then
+      return rightRotate(root)
+  endif
+
+  if balance > 1 and getBalance(left of root) < 0  then
+      set left of root = leftRotate(left of root)
+      return rightRotate(root)
+  endif
+
+  if balance < -1 and getBalance(right of root) <= 0 then
+      return leftRotate(root)
+  endif
+  if balance < -1 and getBalance(right of root) > 0 then
+      set right of root = rightRotate(right of root)
+      return leftRotate(root)
+  endif
+
+  return root
+endfun avldeleteNode
+//
+function main is
+structures
+   define root of type NodePtr
+begin
+   set root = NULL
+   display "\n Inserting nodes: "
+   set root = insertNode(root, 2)
+   set root = insertNode(root, 1)
+   set root = insertNode(root, 7)
+   set root = insertNode(root, 4)
+   set root = insertNode(root, 5)
+   set root = insertNode(root, 3)
+   set root = insertNode(root, 8)
+
+   call displayPreOrder using root
+   display "\n Delete node 7 "
+   set root = avldeleteNode(root, 7)
+
+   display "\nAfter deletion and re-balancing: "
+   call displayPreOrder using root
+
+endfun main
+//
+
+
+/*
+
+//
+description
+  This functions searches for a node with the given key value
+
+function searchKey return type NodePtr 
+   parameters Root of type NodePtr, keyval of type integer
+is
+variables
+   define rkeyval of type integer
+structures
+   define rdata pointer of type DataT
+begin
+  set rdata = datablock of Root    // data from root
+  set rkeyval = keyval of rdata
+  if rkeyval equal keyval or Root equal NULL then
+      return Root
+  elseif keyval < rkeyval then
+      return searchKey (left of Root, keyval)
+   else
+      return searchKey (right of Root, keyval)
+   endif
+endfun searchKey
+//
+function height_tree return type integer 
+   parameters Root of type NodePtr
+is
+variables
+   define leftH of type integer
+   define rightH of type integer
+begin
+   if Root equal NULL then
+      return 0
+   else
+      set leftH = height_tree(left of Root)
+      set rightH = height_tree(right of Root)
+      if leftH > rightH then
+          return leftH + 1
+      else
+          return rightH + 1
+      endif
+   endif
+endfun height_tree
+
+ */

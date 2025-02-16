@@ -1,0 +1,163 @@
+description 
+This program evaluates postfix expression and by calculates its resulting value
+The input to the program is a well-formed postfix expression.
+*/
+import <stdio.h>
+import <stdlib.h>
+import <string.h>
+import "stackh.c"
+
+symbol EOL 0Ah
+
+specifications
+
+struct Datablock is
+     define stdata of type char
+endstruct Datablock
+
+definetype struct Datablock DataT
+
+forward declarations
+
+function eval return type integer 
+  parameters operand1 of type integer, oper of type integer,
+   operand2 of type integer
+   
+function pushStack parameters mstack pointer of type stackType,
+     pterm of type char
+
+function popStack return type char  parameters
+     mstack pointer of type stackType
+
+function StackTop return type char parameters
+     mstack pointer of type stackType
+
+function isOperator return type bool
+    parameters term of type char
+
+implementations
+
+function main is
+ variables
+   define term of type char
+   define term2 of type char
+   define operand1 of type integer
+   define operand2 of type integer
+   define resval of type integer
+ structures
+     define dblock pointer of type DataT
+     define mstacka of type stackType
+     define stackp pointer of type stackType
+     define nodePtr of type NodePtr
+ begin
+    set stackp = address mstacka
+    display "Starting prog "
+    call create_stack using stackp, 80, "stackA" // create empty stack
+   
+    // input postfix expression
+    input "Enter character: ", term
+    while term != EOL do
+    
+       if isOperator (term) != true  then
+            call pushStack using stackp, term
+       else
+            // character is operand
+			set operand2 = popStack (stackp)
+			set operand1 = popStack (stackp)
+            set resval = eval(operand1, term, operand2)
+            call pushStack using stackp, resval
+       endif
+    endwhile 
+    // Display result is in stack.
+    set resval = popStack (stackp)
+    display "The resulting value: ", resval
+    destroy stackp
+    return 0
+endfun main
+//
+function pushStack parameters mstack pointer of type stackType,
+     pterm of type char is
+ structures
+     define ldatab pointer of type DataT
+	 define nodePtr of type NodePtr
+begin
+    // allocate memory for datablock
+    create ldatab type DataT
+	set ldatab->stdata = pterm
+	create nodePtr type NodeType 
+    set nodePtr->datablock = ldatab
+    call push using mstack, nodePtr
+	return
+endfun pushStack
+//
+function popStack return type char  parameters 
+     mstack pointer of type stackType is
+variables
+    define ldata of type char
+structures
+	define nodePtr of type NodePtr
+	define dblock pointer of type DataT
+begin
+    // display "Pop from stack: "
+    set nodePtr = pop(mstack)
+    set dblock = nodePtr->datablock
+	set ldata = dblock->stdata
+    destroy dblock
+    return ldata
+endfun popStack
+//
+function StackTop return type char parameters 
+     mstack pointer of type stackType is
+variables
+    define ldata of type char
+structures
+	define nodePtr of type NodePtr
+	define dblock pointer of type DataT	
+begin
+    // display "Top of stack: "
+    set nodePtr = top(mstack)
+    set dblock = nodePtr->datablock
+	set ldata = dblock->stdata
+    destroy dblock
+    return ldata
+endfun StackTop
+
+
+description
+Determine if term is an operator. Pre   term is a valid operator
+Post return true if operator; false if not
+*/
+function isOperator return type bool
+   parameters term of type char
+is
+begin
+   if term == '*'
+      or term == '/'
+      or term == '+'
+      or term == '-' then 
+     return true
+   else
+     return false
+   endif 
+endfun isOperator
+
+description
+   Evaluate the postfix expression
+  */   
+function eval return type integer 
+  parameters operand1 of type integer, oper of type integer,
+   operand2 of type integer is
+variables
+   define result of type integer
+begin
+   case oper is
+     when '+' : set result   = operand1 + operand2
+	 when '-' : set result   = operand1 - operand2
+     when '*' : set result   = operand1 * operand2
+     when '/' : set result   = operand1 / operand2
+	 otherwise : set result = 0
+   endcase
+   return result
+endfun eval
+
+

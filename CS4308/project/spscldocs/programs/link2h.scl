@@ -1,0 +1,60 @@
+// interface for double-linked list with two ends
+// file: link2h.scl
+
+import "scl.h"
+
+specifications
+
+definetype struct Datablock DataT 
+definetype struct node NodeType
+definetype pointer NodeType NodePtr
+struct node is       // node type
+     define datablock pointer of type DataT 
+     define next pointer of type NodeType   // pointer to next node
+     define prev pointer of type NodeType // pointer to previous node
+endstruct node
+//
+definetype struct llist listT
+
+struct llist is
+     define numnodes of type integer
+     define maxnodes of type integer
+     define lname array [30] of type char
+     define Head of type NodePtr  // head of list
+     define Tail of type NodePtr  // tail of list
+     define current of type NodePtr
+endstruct llist  
+//
+forward declarations
+
+function init_list parameters 
+    plist pointer of type listT,
+    maxn of type integer, pmame pointer of type char 
+function insert_front parameters
+    plist pointer of type listT,
+    cdata pointer of type DataT 
+function remove_front return pointer of type DataT
+   parameters plist pointer of type listT 
+function traverse_display parameters
+  plist pointer of type listT
+function empty_list return type bool parameters 
+  plist pointer of type listT   
+function full_list return type bool parameters 
+  plist pointer of type listT 
+function insert_node parameters plist pointer of type listT,
+  ndata pointer of type DataT, pos of type integer
+function insert_last parameters plist pointer of type listT,
+     ndata pointer of type DataT
+function remove_node return pointer of type DataT
+   parameters plist pointer of type listT,
+        pos of type integer
+function get_data return pointer of type DataT
+   parameters plist pointer of type listT, pos of type integer
+function get_front return pointer of type DataT parameters 
+   plist pointer of type listT    // get data from first node
+function get_next return pointer of type DataT parameters
+   plist pointer of type listT    // copy data from next node
+function remove_last return pointer of type DataT
+  parameters plist pointer of type listT  // remove last node
+function listSize return type integer
+   parameters plist pointer of type listT

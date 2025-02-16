@@ -1,0 +1,68 @@
+/*
+      This program computes the area and perimeter of a triangle, given
+       its the three sides.
+      Program: ctriangle.scl
+      November, 2021.  J. Garrido
+*/
+import "scl.h"
+
+implementations
+
+  description
+    This function computes the perimeter of a 
+    triangle. */
+  function cperimeter return type double 
+  parameters
+       x of type double,  // first side 
+       y of type double,  // second side
+       z of type double   // third side
+  is
+  variables     
+       define lperim of type double
+  begin                          
+       set lperim = x + y + z
+       return lperim
+endfun cperimeter
+
+description
+     This function computes the area of a 
+     triangle.     */
+function carea return type double 
+  parameters
+       x of type double,  // first side 
+       y of type double,  // second side
+       z of type double   // third side
+  is
+  variables
+       define s of type double    // intermediate result
+       define r of type double
+       define larea of type double
+  begin
+       set s = 0.5 * (x + y + z)
+       set r = s * (s - x)*(s - y)*(s - z)
+       set larea = call sqrt using r
+       return larea
+endfun carea
+description
+      This function gets the area and perimeter of a triangle.
+      */
+function main is
+  variables                    // data declarations  
+       define x of type double    // first side of triangle
+       define y of type double   // second side
+       define z of type double   // third side
+       define area of type double
+       define perim of type double    
+  begin 
+      // body of function starts here
+      display "This program computes the area of a triangle" 
+      input "enter value of first side: ", x 
+      input "enter value of second side: ", y 
+      input "enter value of third side: ", z
+      set area = call carea using x, y, z
+      // display "Area of triangle is: ", area
+      set perim = call cperimeter using x, y, z
+      // display "Perimeter of triangle is: ", perim
+      display "Area: ", area, " Perim: ", perim
+      exit
+endfun main 

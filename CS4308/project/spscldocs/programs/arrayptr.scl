@@ -1,0 +1,40 @@
+description
+    Program: arrayptr.scl
+    This program uses an integer array as argument
+     in the call function with myarr.
+    The function declares the parameter as an integer pointer.
+   */
+ import "scl.h"
+forward declarations
+ 
+ function farraym parameters iarr pointer of type integer,
+            factor of type integer, mcount of type integer     
+global declarations
+constants
+    define NUMELEM of type integer = 20     // array size 
+	
+implementations
+	
+function main is
+    variables
+       define j of type integer
+       define myarr array [] of type integer = {10, 20, 30, 40, 50, 60, 70, 78}
+       define mcount of type integer = 8      //current number of elements
+begin
+        call farraym using myarr, 10, mcount 
+        for j = 0 to j < mcount do
+             display "Value: ", myarr[j], j
+        endfor
+        return 0
+endfun main
+    //
+function farraym parameters arrayptr pointer of type integer,
+             lfactor of type integer, lcount of type integer 
+is			 
+variables
+         define j of type integer 
+begin
+        for j = 0 to lcount - 1 do
+             set arrayptr [j] = arrayptr[j] * lfactor
+        endfor
+endfun farraym

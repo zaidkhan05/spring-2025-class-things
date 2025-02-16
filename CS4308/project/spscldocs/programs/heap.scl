@@ -1,0 +1,142 @@
+/*
+ * C Program for an array implentation of a Heap
+ * provide Insertion & Deletion Operation 
+ */
+ 
+
+import "scl.h"
+symbol NUM 50
+
+forward declarations
+
+function display_elements
+
+function insert parameters key of type integer, 
+       location of type integer
+
+function delete parameters key of type integer
+
+global declarations
+ 
+variables
+     define harray array [NUM] of type integer 
+     define numelem of type integer
+
+implementations
+
+function main is
+variables
+    define option of type integer  // for input options
+    define keyval of type integer // element key value
+begin   
+    set numelem = 0   // number of elements in the heap
+    set option = 0
+    while option < 4 do
+        display "1.Insert element \n"
+        display "2.Delete element \n"
+        display "3.Display heap elements \n"
+        display "4.Exit \n"
+        display "Enter option : "
+        input " ", option
+        case option is
+        when 1:
+            display "Enter element to insert : "
+            input " ", keyval
+            call insert using keyval, numelem
+            increment numelem
+        when 2:
+            display "Enter elements to delete: "
+            input " ", keyval
+            call delete using keyval
+        when 3:
+            call display_elements
+        when 4:
+            exit
+        default:
+            display "Invalid option \n"
+        endcase
+    endwhile 
+endfun main
+// 
+function display_elements is
+variables
+    define i of type integer
+begin
+    if numelem equal 0 then
+        display "Heap is empty \n"
+        return
+    endif
+    for i = 0 to numelem - 1 do
+        display " ", harray[i]
+    endfor
+    display "\n"
+endfun display_elements
+// 
+function insert parameters keyval of type integer, location of type integer
+is
+variables
+    define parent of type integer
+begin
+    while location > 0 do
+        set parent = (location - 1)/2
+        if keyval <= harray[parent] then        
+            set harray[location] = keyval
+            return
+        endif
+        set harray[location] = harray[parent]
+        set location = parent
+    endwhile
+    // first element
+    set harray[0] = keyval // key value to the root element 
+endfun insert
+// 
+function delete parameters keyval of type integer
+is
+variables
+    define left of type integer
+    define right of type integer
+    define i of type integer
+    define temp of type integer
+    define parent of type integer
+begin   
+    set i = 0 
+    while i < keyval and keyval not equal harray[i] do
+        increment i
+    endwhile
+    if keyval not equal harray[i] then
+        display "Not found in heap: \n", keyval
+        return
+    endif
+    set harray[i] = harray[numelem - 1]
+    set numelem = numelem - 1
+    set parent = (i - 1) / 2   // find parent of element i 
+    if harray[i] > harray[parent] then
+        call insert using harray[i], i
+        return
+    endif
+    set left = 2 * i + 1    // left child of i
+    set right = 2 * i + 2   // right child of i
+    while right < numelem do
+        if harray[i] >= harray[left] and (harray[i] >= harray[right]) then
+            return
+        endif
+        if harray[right] <= harray[left] then
+            set temp = harray[i]
+            set harray[i] = harray[left]
+            set harray[left] = temp
+            set i = left
+        else
+            set temp = harray[i]
+            set harray[i] = harray[right]
+            set harray[right] = temp
+            set i = right
+        endif
+        set left = 2 * i + 1
+        set right = 2 * i + 2
+    endwhile
+    if left equal numelem - 1 and harray[i] > 0 then
+        set temp = harray[i]
+        set harray[i] = harray[left]
+        set harray[left] = temp
+    endif
+endfun delete

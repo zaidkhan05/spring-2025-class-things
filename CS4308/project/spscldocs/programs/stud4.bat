@@ -1,0 +1,1 @@
+gcc student4.c -o student4.exe substring.o 

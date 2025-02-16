@@ -1,0 +1,50 @@
+/*
+  This program processes the reversing of a linked list.
+  */
+
+import <stdio.h>
+import <stdlib.h>
+import <string.h>
+import "recrevlisth.c"
+
+implementations
+
+function main is
+    variables
+      define pchar of type char
+      define num of type integer
+      define j of type integer
+    structures
+      define mlist pointer of type List
+	  define revlist pointer of type List
+      define rnode pointer of type ChNode
+      define tnode pointer of type ChNode
+    begin
+	  display "Test list reversal"
+	  create mlist type List
+      set mlist->head = NULL  // empty list
+	  set mlist->last = NULL
+      input "Enter number of nodes to process: ", num
+      set j = 1
+      //
+      while j <= num do
+          input "Enter character: ", pchar        
+          // now add new node to linked list
+          create tnode type ChNode
+		  set tnode->mdata = pchar
+		  set tnode->next = NULL
+		  // display "Adding node to list "
+          call addnode using mlist, tnode
+          increment j
+      endwhile   
+      // display data items in the linked list from node tnode
+      // set tnode = call getFirst of mlist
+      call display_data using mlist
+
+      // reverse list
+      set revlist = reverse (mlist)
+      // display list starting from node rnode
+	  display "List in reverse order: "
+	  call display_data using revlist      
+endfun main 
+//

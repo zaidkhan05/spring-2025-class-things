@@ -1,0 +1,40 @@
+description
+   Tests sum of squares
+   function sumsq is a test for sum of squares.
+     It includes recursive calls  ssq
+   */
+import <stdio.h>
+import <stdlib.h>
+forward declarations
+
+function ssq return type integer
+  parameters m of type integer
+//
+implementations
+
+function main is
+  variables                     
+       define n of type integer
+       define res of type integer
+  begin        // body of function starts here
+       input "Enter vlue of n: ", n
+       set res = call ssq using n
+       display "results sum of squares: ", res
+  endfun main
+  //
+  function ssq return type integer
+     parameters m of type integer
+  is
+  variables
+      define lres of type integer
+  begin  
+      if m == 0    then
+         return 0
+      elseif m == 1 then
+         return 1
+      else
+         // recursive call
+         set lres = ssq( m-1) + m * m
+         return lres
+      endif
+  endfun ssq

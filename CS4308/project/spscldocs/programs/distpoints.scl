@@ -1,0 +1,37 @@
+description
+ Program     : distpoints.scl
+ Author      : Jose M Garrido, January, 20, 202.
+ Description : This program computes the distance between two points
+               in a Cartesian plane.
+ */
+import "scl.h"
+
+implementations
+
+function main is
+variables
+    define x1 of type double  // x-coord of P1
+    define y1 of type double  // y-coord of P1
+    define x2 of type double  // x-coord of P2
+    define y2 of type double  // y-coord of P2
+    define dx of type double  // horizontal distance
+    define dy of type double  // vertical distance
+    define dist of type double   // resulting distance 
+begin
+    input "Enter value of x-coordinate of P1: ", x1
+    input "Enter value of y-coordinate of P1: ", y1
+    display "Coordinates of P1: ", x1, y1
+    input "Enter value of x-coordinate of P2: ", x2
+    input "Enter value of y-coordinate of P2: ", y2
+    display "Coordinates of P2: ", x2, y2
+    // compute horizontal distance between points
+    set dx = x2 - x1
+    // compute vertical distance between points
+    set dy = y2 - y1
+    display "Values of horizontal and vertical distances: ", dx, dy
+    // compute the distance between the points
+	set dist = sqrt(dx^2 + dy^2 )
+    // display result
+    display "Distance between P1 and P2: ", dist
+    exit      // execution terminates ok 
+endfun main

@@ -1,0 +1,76 @@
+/*
+  Interface package for indexed files
+  using the PBL btree library
+  May 2021. J Garrido
+  File:  indxFh.scl */  
+  
+import <stdio.h>
+import <stdlib.h>
+import <string.h>
+
+import <errno.h>
+import <stdlib.h>
+import <ctype.h>
+
+import "pbl.h"
+
+specifications
+
+struct idxFile  is
+    define dataFileName array[30] of type char
+	define keyFileName array[30] of type char
+	define dataFilep pointer of type FILE
+	define keyFile pointer of type pblKeyFile_t 
+endstruct idxFile
+
+definetype struct idxFile idxFileT
+
+struct param_record is
+	define datarec pointer of type void
+	define datareclen of type unsigned integer
+	define numblk of type unsigned integer
+	define keyf pointer of type char
+	define keyflen of type unsigned integer
+	define recno pointer of type char
+	define recnolen of type unsigned integer
+	define ival of type integer
+endstruct param_record
+
+definetype struct param_record precT
+
+forward declarations
+
+// Create a data file and its corresponding index (key) file  
+function idxFCreate return type integer
+  parameters idxfp pointer of type idxFileT, dfilepath pointer of type char, 
+    filesettag pointer of type void
+
+// Open the data file and corresponding key file
+//  update = 1;     // to write or update. otherwise is 0
+function idxFOpen return type integer
+  parameters idxfp pointer of type idxFileT, 
+     openMode pointer of type char, update of type integer
+  
+// Write data record and corresponding key record
+function idxFWrite return type integer
+  parameters idxfp pointer of type idxFileT, precPtr pointer of type precT
+
+// Given a key value, find and read the record from data file
+function idxFReadRec return type integer
+  parameters idxfp pointer of type idxFileT, precPtr pointer of type precT
+  
+// Read the next record from data file, by key value
+function idxFReadNext return type integer
+  parameters idxfp pointer of type idxFileT, precPtr pointer of type precT
+
+// Read the first record from data file and key file
+function idxFReadFirst return type integer
+  parameters idxfp pointer of type idxFileT, precPtr pointer of type precT
+
+// Delete a record given its key, from the data file and from the key file
+function idxFDeleteRec return type integer 
+  parameters idxfp pointer of type idxFileT, precPtr pointer of type precT 
+
+// close data file and thye corresponding key file 
+function idxFClose return type integer
+  parameters idxfp pointer of type idxFileT 

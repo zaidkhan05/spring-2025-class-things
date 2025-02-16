@@ -1,0 +1,109 @@
+description
+  databtree.scl
+  This program shows how to create nodes and construct, 
+  traverse a binary tree
+  This program links with the library 'btreelib.scl'.
+  J. M. Garrido Feb. 2022
+  */
+
+import "btreeh.c"
+
+forward declarations
+
+function make_dblock return pointer type DataT parameters
+      nname pointer of type char, nage of type integer, njobcode of type integer 
+function display_data return type void parameters pdata pointer of type DataT
+function traverse_display parameters ptree pointer of type btreeT
+
+implementations
+
+function main is
+  // local data definitions
+  variables
+     define max_nodes of type integer
+     define clabel of type char
+     define tnum of type integer
+	 define n of type integer
+  structures
+     define cbtree pointer of type btreeT
+     define dblock pointer of type DataT
+     define lnodePtr of type NodePtr
+  begin 
+     // create and initialize a binary with max 40 nodes
+     set cbtree = init_tree (40, "Exp Binary Tree")
+     display "created binary tree"
+     
+	 set lnodePtr = build_tree (cbtree)
+	 // display the nodes in the tree starting with its root
+	 display "display the nodes in the tree "  
+	 call preOrder_display using lnodePtr
+	 
+	 call destroy_tree using lnodePtr
+	 destroy dblock
+	 destroy lnodePtr
+/*	 
+     
+     
+     
+     
+     
+ */    
+     
+     return 0
+endfun main
+//
+/*
+function traverse_display parameters pbtree pointer of type btreeT is
+variables   
+   define i of type integer
+structures
+   define lblock pointer of type DataT
+   define cnodePtr of type NodePtr
+begin
+   display "Traverse and display data in list"
+   set i = plist->numnodes
+   display "(traverse_display) Num nodes ", i
+   if pbtree->numnodes <= 0 then
+      return
+   endif
+   set cnodePtr = get_front(plist)     // get node at front of list 
+   set lblock = cnodePtr->datablock    // get data block from node
+   call display_data using lblock
+   for i=2 to plist->numnodes loop
+      display "display the next node " 
+      set cnodePtr = get_next(plist)        // get next node from list
+      set lblock = cnodePtr->datablock      // get data block
+      call display_data using lblock
+   endfor
+endfun traverse_display 
+//
+function make_dblock return pointer type DataT
+    parameters plabel of type char, pnodenum of type integer is
+structures
+    define ldatab pointer of type DataT 
+begin
+    // allocate memory for datablock
+    create ldatab type DataT
+    
+    set ldatab->label = plabel
+    set ldatab->nodenum = pnodenum
+    return ldatab
+endfun make_dblock
+//  
+// display data block
+function display_data return type void parameters pblock pointer of type DataT is
+   variables
+      define mlabel of type integer
+      define mnoden of type integer     
+begin
+    set mlabel = pblock->label
+    set mnoden = pblock->nodenum
+    display "Data name: ", lname
+    display "Node: ", mlabel
+    display "Node number: ", mnoden
+endfun display_data
+
+//
+
+
+*/

@@ -1,0 +1,1 @@
+gcc file_proc6.c -o filep6.exe indxF.o libpbl.a
