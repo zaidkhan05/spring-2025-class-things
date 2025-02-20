@@ -1,0 +1,113 @@
+// Program to insert new elements to Heap
+// simple implementation
+ 
+import "scl.h"
+ 
+symbol MAX 1000 // Max size of Heap
+forward declarations 
+ 
+function swap parameters xp pointer of type integer,
+    yp pointer of type integer
+    
+// Function to move up ith element in a Heap
+// 
+function moveUp parameters arr array[MAX] of type integer,
+   i of type integer
+
+// Function to insert a new element to the Heap
+function insertElem parameters harr array[] of type integer,
+    Key of type integer
+ 
+// function to display elements of heap of size numel
+function displayHeap parameters harr array[] of type integer
+
+global declarations
+
+variables
+   define numel of type integer  // number of elements in heap
+
+implementations
+ 
+// Test function
+function main is
+variables
+    define harr array[MAX] of type integer = {60, 25, 35, 20, 22}  
+    define keyval of type integer
+begin 
+    set numel = 5        // current elements
+    call displayHeap using harr
+   
+    set keyval = 70
+    display "inserting element 70: "
+    call insertElem using harr, keyval
+    call displayHeap using harr    
+    set keyval = 65
+    display "inserting element 65: "
+    call insertElem using harr, keyval
+    call displayHeap using harr
+    return 0
+endfun main
+//
+// Function to move up ith element in a Heap with
+// numel elements 
+function moveUp parameters harr array[] of type integer,
+   i of type integer
+is
+variables
+    define parent of type integer
+begin   
+    // Find parent
+    set parent = (i - 1) / 2
+ 
+    if harr[parent] > 0 then
+        // For Max-Heap
+        // If current element is greater than its parent
+        // Swap both of them and call moveUp again
+        // for the parent
+        if harr[i] > harr[parent] then
+            call swap using address harr[i], address harr[parent]
+            // Recursively move up the parent element
+            call moveUp using harr, parent
+        endif
+    endif
+endfun moveUp
+//
+// Function to insert a new node to the Heap
+function insertElem parameters harr array[] of type integer,
+    keyval of type integer
+is
+variables
+    define num of type integer
+begin
+    // Increase number of elements in Heap
+    set numel = numel + 1
+    // Insert the element at end of Heap
+    set harr[numel - 1] = keyval
+ 
+    // Move up the new element following a
+    set num = numel - 1
+    call moveUp using harr, num
+endfun insertElem
+//
+function displayHeap parameters harr array[] of type integer
+is
+variables
+    define i of type integer
+begin   
+    for i = 0 to numel - 1 do
+        display " ", harr[i]
+    endfor 
+    display "\n"
+endfun displayHeap
+//
+function swap parameters xp pointer of type integer,
+    yp pointer of type integer
+is
+variables
+    define temp of type integer
+begin
+    set temp = deref xp
+    set deref xp = deref yp
+    set deref yp = temp
+endfun swap
+//

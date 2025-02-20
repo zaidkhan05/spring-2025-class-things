@@ -1,0 +1,22 @@
+/*
+ Program     : tempctof.scl
+ Author      : Jose M Garrido
+ Description : Read value of the temperature Celsius from input console,
+               convert to degrees Fahrenheit, and display value of this
+               new temperature value on the output console
+ */
+import "scl.h"
+
+implementations
+
+function main is
+variables
+    define tempc of type double   // temperature in Celsius
+    define tempf of type double   // temperature in Fahrenheit
+begin
+    input "Enter value of temp in Celsius: ", tempc
+    display "Value of temp in Celsius: ", tempc
+    set tempf = tempc * (9.0/5.0) + 32.0
+    display "Value of temperature in Fahrenheit: ", tempf
+    exit   // execution terminates ok
+endfun main

@@ -1,0 +1,24 @@
+// interface for the stack
+// using the single-linked list library
+// in 'linkedlib.scl' and 'linkedh.scl'
+import "linkedh.c"
+
+specifications
+
+definetype struct llist stackType
+
+forward declarations
+
+function create_stack parameters stack pointer of type stackType,
+    maxn of type integer,  sname pointer of type char
+function push parameters stack pointer of type stackType,
+    pnode of type NodePtr
+
+function pop return type NodePtr parameters
+     stack pointer of type stackType
+function top return type NodePtr parameters
+     stack pointer of type stackType
+function sEmpty return type bool parameters stack pointer of type stackType
+function sFull return type bool parameters stack pointer of type stackType
+function stackSize return type integer parameters
+     stack pointer of type stackType

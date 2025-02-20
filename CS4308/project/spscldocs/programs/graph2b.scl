@@ -1,0 +1,119 @@
+// Adjacency List representation
+
+import "graph2h.c"
+implementations
+
+// Create a node
+function createNode return type nodePtr 
+  parameters vertx of type integer is
+structures
+  define newNode of type nodePtr
+begin  
+  create newNode type nodeStruct
+  set newNode->vertex = vertx
+  set newNode->next = NULL
+  return newNode
+endfun createNode
+//
+// Create an empty graph
+function createGraph return type graphPtr 
+   parameters nvertices of type integer
+is
+variables
+  define i of type integer
+structures
+  define graph of type graphPtr
+begin  
+  create graph type graphstruct
+  set graph->numVertices = nvertices
+  // create array of nodes
+  create graph->nodeLists type nodePtr nvertices
+  create graph->visited type bool nvertices
+  // initialize each node linked list
+  for i = 0 to nvertices - 1 do
+    set graph->nodeLists[i] = NULL
+    set graph->visited[i] = false
+  endfor
+  return graph
+endfun createGraph
+// 
+// Add edge from source to destination
+// on an empty graph
+function addEdge parameters graph of type graphPtr, 
+    source of type integer, destination of type integer
+is 
+structures
+  define newNode of type nodePtr
+begin  
+  set newNode = createNode(destination)
+  set newNode->next = graph->nodeLists[source]
+  set graph->nodeLists[source] = newNode
+
+  // Add edge 
+  set newNode = createNode(source)
+  set newNode->next = graph->nodeLists[destination]
+  set graph->nodeLists[destination] = newNode
+endfun addEdge
+//
+// Depth First Seach traversal
+function depthFirstT parameters graph of type graphPtr, vertex of type integer
+is
+variables
+   define connectedVertex of type integer
+   define nList of type nodePtr
+   define tnode of type nodePtr
+begin  
+   set nList = graph->nodeLists[vertex]
+   set tnode = nList
+
+   set graph->visited[vertex] = true
+   display "Visited ", vertex
+
+   while tnode not equal NULL do 
+     set connectedVertex = tnode->vertex
+     if graph->visited[connectedVertex] equal false then
+        call depthFirstT using graph, connectedVertex
+     endif
+     set tnode = tnode->next
+   endwhile
+endfun depthFirstT
+//
+// Display the graph
+function displayGraph parameters graph of type graphPtr 
+is
+variables
+   define v of type integer   // number of vertex
+   define dvertex of type integer
+structures
+   define tnode of type nodePtr
+begin
+   for v = 0 to graph->numVertices - 1 do
+      set tnode = graph->nodeLists[v]
+      display "\n Vertex ", v
+      while tnode not equal NULL do
+         set dvertex = tnode->vertex
+		 displayn " | ", dvertex
+         set tnode = tnode->next
+      endwhile
+      display "\n"
+   endfor
+endfun displayGraph
+/*
+// 
+function main is
+structures
+  define graph of type graphPtr
+begin  
+  set graph = createGraph(4)
+  call addEdge using graph, 0, 1
+  call addEdge using graph, 0, 2
+  call addEdge using graph, 1, 2
+  call addEdge using graph, 2, 3
+  //
+  call displayGraph using graph
+  //
+  display "Depth fist traversal \n"
+  call depthFirstT using graph, 2
+  return 0
+endfun main
+*/

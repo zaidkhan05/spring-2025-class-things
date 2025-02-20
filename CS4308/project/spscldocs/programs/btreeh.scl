@@ -1,0 +1,72 @@
+description
+ This is the interface for binary search trees */
+import "scl.h"
+specifications 
+
+definetype struct Datablock DataT
+definetype struct node NodeType
+definetype pointer NodeType NodePtr
+struct node is       
+     define datablock pointer of type DataT 
+     define left pointer of type NodeType   // pointer to left node
+     define right pointer of type NodeType // pointer to right node
+endstruct node
+//
+definetype struct bintree btreeT
+
+
+struct bintree is
+     define numnodes of type integer
+     define maxnodes of type integer
+     define lname array [30] of type char
+     define Root of type NodePtr  
+endstruct bintree
+//
+struct Datablock is              // data block type
+     define keyval of type integer
+     define nodenum of type integer
+endstruct Datablock
+
+definetype struct Datablock DataT
+
+forward declarations
+
+function init_tree return pointer of type btreeT parameters 
+    maxn of type integer, pname pointer of type char 
+function build_tree return type NodePtr
+     parameters ptree pointer of type btreeT
+
+function insert_node return type NodePtr
+    parameters root of type NodePtr, ndata pointer of type DataT
+// function insert_node parameters root of type NodePtr, 
+//       n of type integer
+function preOrder_display parameters root of type NodePtr
+
+function traverse_display parameters
+  ptree pointer of type btreeT
+function empty_list return type bool parameters 
+  ptree pointer of type btreeT   
+function full_list return type bool parameters 
+  ptree pointer of type btreeT 
+// function insert_node parameters ptree pointer of type btreeT,
+//  ndata pointer of type DataT, pos of type integer
+
+function findLargestKey return type NodePtr
+     parameters Root of type NodePtr
+     
+function searchKey return type NodePtr 
+   parameters Root of type NodePtr, keyval of type integer
+   
+function get_data return pointer of type DataT
+   // parameters ptree pointer of type btreeT, pos of type integer
+   
+function listSize return type integer
+   parameters ptree pointer of type btreeT
+   
+function height_tree return type integer 
+   parameters Root of type NodePtr
+
+function deleteNode 
+    parameters Root of type NodePtr, keyval of type integer
+    
+function destroy_tree parameters Root of type NodePtr

@@ -1,0 +1,50 @@
+/*
+ Program     : solquad.scl
+ Author      : Jose M Garrido, Nov 21 2021.
+ Description : Compute the roots of a quadratic equation.
+    Read the value of the coefficients: a, b, and c from
+    the input console, compute and display value of roots.
+*/
+import "scl.h"
+
+implementations
+
+function main is
+   variables
+     define a of type double    // coefficient a
+     define b of type double
+     define c of type double
+     define disc of type double  // discriminant
+     define x1r of type double   // real part of root 1
+     define x1i of type double   // imaginary part of root 1
+     define x2r of type double
+     define x2i of type double
+begin
+     input "Enter value of cofficient a: ", a
+     display "Value of a: ", a
+     input "Enter value of cofficient b: ", b
+     display "Value of a: ", b
+     input "Enter value of cofficient c: ", c
+     display "Value of a: ", c
+     set disc = b^2 - 4.0 * a * c
+     display "discreminant: ", disc
+     if (disc < 0.0)  then
+          // complex roots 
+          set disc = -disc
+          set x1r = -b/(2.0 * a)
+          set x1i = sqrt(disc)/(2.0 * a)
+          set x2r = x1r
+          set x2i = -x1i
+          display "Complex roots "
+          display "x1r: ", x1r, " x1i: ",  x1i
+          display "x2r: ", x2r, " x2i: ", x2i
+     else 
+          // real roots 
+          set x1r = (-b + sqrt(disc))/(2.0 * a)
+          set x2r = (-b - sqrt(disc))/(2.0 * a)
+          display "Real roots:"
+          display "x1: ", x1r, " x2: ", x2r
+     endif
+     exit      // execution terminates ok
+endfun main
+     

@@ -1,0 +1,190 @@
+import <stdlib.h>
+import "recrevlisth.c"
+
+implementations
+
+ description
+   This functions checks whether the list is empty
+   J Garrido
+   */
+ function isEmpty return type bool parameters plist pointer type List  is 
+ begin
+      if plist->head == NULL then
+         return true   // List is empty
+      else
+        return false  // list is not empty
+ endif
+ endfun isEmpty
+ //
+ description
+    This function will insert a node at the front of the list
+    */
+ function insertFirst
+              parameters plist pointer type List,
+                  pnode pointer of type ChNode is
+ begin
+    set pnode->next = plist->head 
+    if plist->head equal NULL then
+       set plist->last = pnode
+    endif 
+    set plist->head = pnode       // new first node
+ endfun insertFirst
+ //
+ function addnode parameters plist pointer type List,
+   pnode pointer of type ChNode is
+ structures
+    define temp pointer of type ChNode
+ begin
+    // last node references current last node
+    if plist->last not equal NULL then
+       set temp = plist->last
+       set temp->next = pnode
+       set plist->last = pnode
+    else
+       set plist->head = pnode
+       set plist->last = pnode
+    endif
+ endfun addnode
+ //
+ description 
+    This function will return a copy of the 
+    the node at the front of the list.
+    It assumes that the list is not empty
+    */
+ function getFirst return pointer type ChNode
+    parameters plist pointer type List
+ is 
+  structures
+      define tnode pointer of type ChNode
+ begin
+      set tnode = plist->head
+      return tnode 
+ endfun getFirst
+ //
+ description 
+    This function will remove node at the front of the list. 
+    It assumes that the list is not empty
+    */
+ function deleteFirst parameters plist pointer type List is 
+  structures
+      define tnode pointer of type ChNode
+      define tnode2 pointer of type ChNode
+ begin
+      set tnode = plist->head
+      set tnode2 = plist->head
+      set plist->head = tnode2->next  // reference to the next node in list 
+      destroy tnode
+ endfun deleteFirst
+ // 
+ description
+    This function traverses the list starting from node pnode
+    and displays the data of the nodes of the list.
+    */
+ function display_data parameters plist pointer type List
+ is
+ variables
+    define ldata of type char
+ structures 
+    define current pointer of type ChNode
+ begin
+    display "List nodes fist-->last: "
+    set current = plist->head
+    while current != NULL do      // traverse list to last node
+       set ldata = current->mdata
+       display "Node data: ", ldata
+       set current = current->next // next node
+    endwhile
+    display ""
+ endfun display_data
+ // 
+ // This function removes and returns a list with the node
+ // at head of list
+ function get_hsub return pointer type List 
+   parameters plist pointer of type List
+ is
+ structures
+    define thead pointer of type ChNode
+    define rlist pointer of type List
+ begin
+    set thead = plist->head
+    set plist->head = thead->next
+    set thead->next = NULL
+	create rlist type List
+    set rlist->head = thead
+    return rlist
+ endfun get_hsub
+ //
+ // partition the list 
+ // returns ref to tail sublist
+ function get_tsub return pointer type List
+   parameters plist pointer of type List is
+ structures
+    define tnode pointer of type ChNode
+    define tlist pointer of type List // tail sublist
+ begin
+    display "(get_tsub) 1 "
+    call display_data using plist
+    create tlist type List
+    set tnode = plist->head
+    set tlist->head = tnode->next
+	set tlist->last = plist->last
+    set tnode->next = NULL
+	
+	// call display_data using tlist
+    return tlist
+ endfun get_tsub
+ //
+ description
+  Function to concatenate two sublists: L1 and L2  */
+ function conclist return pointer type List 
+   parameters L1 pointer of type List, L2 pointer of type List
+ is
+ structures
+     define tnode pointer of type ChNode
+ begin
+     set tnode = L1->head
+     while tnode->next not equal NULL do
+        set tnode = tnode->next
+     endwhile
+     set tnode->next = L2->head
+     set L1->last = L2->last
+     return L1
+ endfun conclist
+ //
+ // Function to reverse the nodes of a list
+ function reverse return pointer type List
+   parameters plist pointer of type List is
+ structures
+     define tailt pointer of type List
+     define headt pointer of type List
+     define revlist pointer of type List
+     define revplist pointer of type List
+     define tpnode pointer of type ChNode
+ begin
+     set tpnode = plist->head
+     if plist equal NULL then
+        return NULL
+     elseif tpnode->next equal NULL then
+        return plist
+     else
+        // partition list into tail and head sublists
+		// display "Head of list"
+		set headt = get_hsub (plist)
+		// call display_data using headt
+		
+		// display "Tail of list"
+        // set tailt = get_tsub(plist)
+		// call display_data using tailt
+		       
+		set tailt = plist
+        //
+        // reverse tail sublist
+        set revplist = reverse (tailt)   // recursive call
+        //
+        // concatenate reversed tail sublist and head
+        set revlist = conclist (revplist, headt)
+        return revlist
+     endif
+ endfun reverse
+
+

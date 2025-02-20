@@ -1,0 +1,34 @@
+/*
+ Program     : squareprog.scl
+ Author      : Jose M Garrido 
+ Description : Compute the square of the value of a variable.
+ */
+import "scl.h"
+
+forward declarations
+
+function squared return type double
+     parameters s of type double   // prototype
+	 
+implementations 
+
+function main is
+variables
+    define x of type double       // variable declaration 
+    define y of type double 
+begin
+    display "Square of a value "
+    input "Enter value: ", x      // read a value of variable x 
+    set y = squared(x)            // compute square of x 
+    display "The square of ", x, " is: ", y
+    exit                      // execution terminates OK 
+endfun main
+//
+function squared return type double
+     parameters p of type double is
+  variables  
+    define res of type double
+  begin
+    set res = p * p
+    return res
+endfun squared 

@@ -1,0 +1,46 @@
+description
+ This is the interface of a Heap 
+ for a Priority Queue */
+import "scl.h"
+
+symbol MAX 10000 // Max size of Heap
+
+specifications 
+
+definetype struct item ItemType
+definetype pointer ItemType ItemPtr
+struct item is
+     define priority of type integer 
+	 define serial of type integer
+	 define itemID of type integer
+endstruct item
+//
+definetype struct heap HeapT
+
+struct heap is
+     define numitems of type integer
+     define maxitems of type integer
+endstruct heap
+//
+global declarations
+
+variables
+   define numel of type integer  // number of elements in heap
+structures
+   define heap_array array [MAX] of type ItemType
+
+forward declarations
+
+function init_heap return pointer of type HeapT parameters 
+    maxn of type integer
+
+function insertElem parameters 
+    Key of type integer, sequenceNumber of type integer
+	
+// Function to delete the root from Heap
+function deleteElem 
+
+// function to display elements of heap of size numel
+function displayHeap parameters heap pointer of type HeapT
+
+	   

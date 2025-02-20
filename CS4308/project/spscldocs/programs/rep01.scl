@@ -1,0 +1,222 @@
+description
+  This program produces two reports from the same input file.
+  Jose Garrido, updated April 10, 2022.
+*/
+import "scl.h"
+
+symbol FILENAME_LEN 60
+symbol KEYLEN 6
+symbol EOS '\0'
+symbol SPC ' '       // space char
+
+specifications
+// record of input data file
+
+struct name_struct is
+   define I_First array [10] of type char
+   define I_Mid of type char
+   define I_Last array [15] of type char
+endstruct name_struct
+definetype struct name_struct nameT
+
+struct address_struct is
+   define I_Street array [20] of type char
+   define I_City array [15] of type char
+   define I_State array [2] of type char
+   define I_Zip array [5] of type char 
+endstruct address_struct
+definetype struct address_struct addressT
+   
+struct input_record is
+   define I_Name of type nameT
+   define I_Address of type addressT
+endstruct input_record
+definetype struct input_record input_recT
+
+struct form1_line is 
+   define fill array [9] of type char          // spaces
+   define form1_last array [16] of type char 
+   define fill2 array [2] of type char           // spaces
+   define form1_first array [27] of type char 
+   define fill3 of type char 
+   define form1_mid of type char
+   define fill4 array [4] of type char          // spaces
+   define form1_street array [21] of type char 
+   define fill5 array [4] of type char    // spaces
+   define form1_city array [15] of type char 
+   define fill6 of type char             // = ' '
+   define form1_state array [2] of type char  
+   define fill7 of type char              //  = ' '   
+   define form1_zip array [6] of type char 
+endstruct form1_line
+definetype struct form1_line form1_lineT
+
+struct form2_header_1 is 
+    define fill array [15] of type char   // spaces
+    define fill2 array [30] of type char  // = "   PERSONNEL MASTER LISTING   " 
+    define fill3 array [10] of type char  // spaces
+    define fill4 array [5] of type char   // = "Page " 
+    define f2h_page array [6] of type char 
+endstruct form2_header_1
+definetype struct form2_header_1 form2_header_1T
+
+struct form2_header_2 is 
+    define fill array [15] of type char   // spaces
+    define fill2 array [31] of type char  // = "**** COMPANY CONFIDENTIAL ****" 
+endstruct form2_header_2
+definetype struct form2_header_2 form2_header_2T
+
+forward declarations 
+
+   function fill_values
+   function A900_print_headers
+   function A100_print_reports
+   function A200_print_reports
+
+global declarations
+
+ files
+    file input_file with infilename  "repin.dat"       // input file
+    file form1_report with outfilename1  "form1.dat"
+    file form2_report with outfilename2  "form2.dat"
+ variables
+    define end_file of type unsigned integer
+    define max_lines_on_form2 of type unsigned integer = 55 
+    define form2_line_counter of type unsigned integer = 0 
+    define page_no of type unsigned integer = 0 
+	define recno of type unsigned integer = 0
+	define inreclen of type integer                   // length of input record
+	define fcount pointer of type char 
+	define Input_recCptr pointer of type char
+    
+ structures
+   define Input_Record of type input_recT
+   define Input_recPtr pointer of type input_recT
+   define Form1_Line of type form1_lineT
+   define Form2_Header_1 of type form2_header_1T
+   define Form2_Header_2 of type form2_header_2T
+   
+
+implementations
+
+function main is
+    
+ begin
+    display "Starting program"
+	set Input_recPtr = address Input_Record 
+    set Input_recCptr = cast pointer char Input_recPtr
+	
+	call fill_values     // initialize fields 
+
+   // open input file (a standard text data file)
+    display "Open ", infilename 
+    set input_file = fopen(infilename,"r")       // open input file
+    if input_file equal NULL then
+       display "Error! opening input file"
+       // Program exits if the file pointer returns NULL.
+       exit
+    endif   
+    
+    display "Creating output/open file ", outfilename1
+    
+    // create and open ReportFile output file file 
+    set form1_report = fopen(outfilename1, "w" )     
+    if form1_report equal NULL
+    then   
+         display "Error creating/opening output1 file ", outfilename1
+         exit
+    endif
+  
+   // create and open ReportFile output file file 
+    set form2_report = fopen(outfilename2, "w" )     
+    if form2_report equal NULL
+    then   
+         display "Error creating/opening output2 file ", outfilename2
+         exit
+    endif
+
+    // PERFORM A900-PRINT-HEADERS-ROUTINE.
+    call A900_print_headers
+    
+    // PERFORM A100-PRINT-REPORTS UNTIL END-OF-FILE = "Y". 
+    repeat  
+        call A100_print_reports
+     until end_file equal 1 
+    endrepeat   
+    //
+    call fclose using input_file
+    call fclose using form1_report
+    call fclose using form2_report
+    display "End program"
+    
+    return 0
+endfun main
+//
+function fill_values is
+begin
+    call memset using fill in Form1_Line, SPC, 9   // fill with spaces
+    call memset using fill2 in Form1_Line, SPC, 2
+	set fill3 in Form1_Line = SPC
+    call memset using fill4 in Form1_Line, SPC, 4
+	call memset using fill5 in Form1_Line, SPC, 4
+    set fill6 in Form1_Line = SPC
+    set fill7 in Form1_Line = SPC
+	//
+    call memset using fill in Form2_Header_1, SPC, 15
+    // copy string
+    call memcpy using fill2 in Form2_Header_1, "   PERSONNEL MASTER LISTING   ", 30
+    call memset using fill3 in Form2_Header_1, SPC, 10
+    call memcpy using fill4 in Form2_Header_1,  "Page ", 5
+    call memset using fill in Form2_Header_2, SPC, 15
+    call memcpy using fill2 in Form2_Header_2, "**** COMPANY CONFIDENTIAL ****", 30
+    set fill2[30] in Form2_Header_2 = EOS
+endfun fill_values  
+//
+function A900_print_headers is
+/*
+This routine generates a form feed, writes two lines, 
+  skips two lines, then resets the line counter to 4 to 
+  indicate used lines on the current logical page. 
+  Line 5 on this page is the next print line. 
+  */
+ begin
+    add 1 to page_no    
+    call sprintf using f2h_page in Form2_Header_1, "6%d", page_no    
+    // WRITE FORM2-PRINT-LINE FROM FORM2-HEADER-1 AFTER ADVANCING PAGE. 
+    
+    //WRITE FORM2-PRINT-LINE FROM FORM2-HEADER-2 
+      //                     BEFORE ADVANCING 2. 
+    // MOVE 4 TO FORM2-LINE-COUNTER.   
+endfun A900_print_headers
+// 
+function A100_print_reports is
+begin
+    display "reading input record: ", recno
+    // READ INPUT-FILE AT END MOVE "Y" TO END-OF-FILE. 
+    // IF END-OF-FILE NOT = "Y" 
+       // PERFORM A200-PRINT-REPORTS.
+    set inreclen = sizeof(input_recT)
+	
+    set fcount = fgets(Input_recCptr, inreclen, input_file) 
+    set end_file = feof(input_file)
+	if end_file not equal 1 then
+	    call A200_print_reports
+	endif
+	increment recno
+endfun A100_print_reports
+//
+function A200_print_reports is
+begin
+    if form2_line_counter greater than max_lines_on_form2 then
+	    call A900_print_headers
+	endif
+    // move data items from input record to print line
+	// and write print line
+	call memcpy using form1_last in Form1_Line, I_Last in I_Name in Input_Record, 15
+	call memcpy using form1_first in Form1_Line, I_First in I_Name in Input_Record, 10
+	set form1_mid in Form1_Line = I_Mid in I_Name in Input_Record
+	call memcpy using form1_street in Form1_Line, I_Street in I_Address in Input_Record, 20
+	call memcpy using form1_city in Form1_Line, I_City in I_Address in Input_Record, 15
+	call memcpy using form1_state in Form1_Line, I_State in I_Address in Input_Record, 2
+	call memcpy using form1_zip in Form1_Line, I_Zip in I_Address in Input_Record, 5
+endfun 	A200_print_reports

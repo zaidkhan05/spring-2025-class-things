@@ -1,0 +1,48 @@
+// Definitions of the interface of B-Tree
+
+import "scl.h"
+symbol NUMKEYS 24
+symbol NUMCHILD 12
+
+specifications
+
+// A BTree node
+definetype struct B_treeNode BTreeNode
+definetype pointer BTreeNode BTreeNodePtr
+
+struct B_treeNode is
+    define keys array [NUMKEYS] of type integer  // An array of keys
+    define mindeg of type integer               // Minimum degree 
+    define numkeys of type integer         // Current number of keys
+    define leaf of type bool              // true when node is leaf
+    define Child array [NUMCHILD] of type BTreeNodePtr  // child pointers
+endstruct B_treeNode
+
+definetype struct B_Tree BTree
+
+struct B_Tree is
+    define mindeg of type integer   // Minimum degree
+    define root pointer of type BTreeNode 
+endstruct B_Tree
+    
+forward declarations
+
+// Initialize tree
+function BTree_init parameters pmindeg of type integer, tree pointer of type BTree 
+
+// tree traverse
+function ttraverse parameters tree pointer of type BTree 
+
+// search a key in this tree
+function tsearch return pointer of type BTreeNode parameters
+    pkey of type integer, tree pointer of type BTree 
+
+// Insert a new key in this B-Tree
+function insert parameters pkey of type integer, tree pointer of type BTree
+
+// Remove a new key from thie B-Tree
+function tremove_key parameters pkey of type integer, tree pointer of type BTree
+
+
+
+ 

@@ -1,0 +1,29 @@
+import "scl.h"
+
+specifications
+
+struct Point is
+     define x of type double
+     define y of type double 
+endstruct Point
+
+definetype struct Point PointT
+
+implementations
+
+function main is
+structures
+     define fvar of type PointT 
+     define svar of type PointT
+     define pointPtr pointer of type PointT
+begin     
+     set fvar.x = 10.5 
+     set fvar.y = 7.35
+     set pointPtr = address fvar
+     set svar = deref pointPtr
+     display "fvar x: ", x in fvar
+     display  "fvar y: ", y of pointPtr 
+     display "svar x: ", svar.x
+     display  "svar y: ", svar.y
+     return 0
+endfun main

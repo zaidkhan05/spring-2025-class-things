@@ -1,0 +1,261 @@
+description
+  This program reads a text file sequentially and 
+    writes to a text file for printing a report
+*INPUT      The student record file Students.Dat  Records in this file 
+*           are sequenced on ascending Student Number. 
+*OUTPUT     Shows the number of student records in the file and the  
+*           number of records for males and females. 
+*PROCESSING For each record read; 
+*               Adds one to the TotalStudents count 
+*               IF the Gender is Male   adds one to TotalMales 
+*               IF the Gender is Female adds one to TotalFemales 
+*           At end of file writes the results to the report file.        
+  Adapted to SCL, Jose Garrido, updated May 10, 2022.
+*/  
+
+import "scl.h"
+
+symbol EOS 00h               // end of string
+symbol LF  0Ah               // linefeed or newline
+
+specifications
+
+enum genderd is
+    Male = 'M',
+    Female = 'F'
+endenum genderd
+
+definetype enum genderd genderT
+
+struct stuname is 
+   define Surname array[9] of type char
+   define Initials array [3] of type char
+endstruct stuname
+definetype struct stuname stunameT
+
+struct dateBirth is
+        define YOBirth array [5] of type char  
+        define MOBirth array [3] of type char
+        define DOBirth array [3] of type char
+endstruct dateBirth
+definetype struct dateBirth dateBirthT
+
+struct student_record is
+   define StudentId array [8] of type char
+   define StudentName of type stunameT
+   define DateOfBirth of type dateBirthT
+   define CourseCode array[5] of type char
+   define Gender of type char              // genderT
+endstruct student_record
+definetype struct student_record student_recT  // 37 chars
+
+struct stu_tot is
+   define fill array [17] of type char           // VALUE "Total Students = "
+   define PrnStudentCount array [6] of type char // PIC Z,ZZ9
+endstruct stu_tot
+definetype struct stu_tot stutotT       // 23 chars
+
+struct stu_male_tot is   
+   define fill array [17] of type char 
+   define PrnMaleCount array [6] of type char
+endstruct stu_male_tot
+definetype struct stu_male_tot male_totT  // 23 chars
+   
+struct stu_female_tot is
+   define fill array [18] of type char 
+   define PrnFemaleCount array [6] of type char 
+endstruct stu_female_tot 
+definetype struct stu_female_tot female_totT    // 23 chars
+
+struct WSd is  
+   define StudentCount of type unsigned integer 
+   define MaleCount of type unsigned integer
+   define FemaleCount of type unsigned integer 
+endstruct WSd
+definetype struct WSd work_storageT
+
+forward declarations 
+
+   function fill_values
+   function substring parameters src_string pointer of type char,
+      position of type integer, length of type integer, dest_string pointer of type char
+
+global declarations
+
+ files
+    file infile with infilename  "student3.txt"   // input file
+    file repoutfile with outfilename  "student.rpt"
+ variables    
+    define k of type integer       
+    define recno of type integer               // record number
+    
+    define PrintLine array [42] of type char  
+    define HeadingLine array [22] of type char = "  Record Count Report"
+ structures
+    define StudentDetails of type student_recT       
+    define StudentTotalLine of type stutotT
+    define MaleTotalLine of type male_totT
+    define FemaleTotalLine of type female_totT
+    define WorkTotals of type work_storageT
+
+implementations
+ 
+function main is 
+ variables  
+    define inreclen of type integer      // input record length
+    define totrecs of type integer       // total number of records
+    define end_file of type integer
+    define StudentRecord array [45] of type char
+    define gcount of type unsigned integer
+    define fcount pointer of type char 
+    define j of type integer
+ begin
+    display "Starting program" 
+    call fill_values     // intialize fields
+    
+    // open StudentFile input file (a standard text data file)
+    display "Open ", infilename 
+    set infile = fopen(infilename,"r")       // open input file
+    if infile equal NULL then
+       display "Error! opening input file"
+       // Program exits if the file pointer returns NULL.
+       exit
+    endif   
+    
+    display "Creating output file ", outfilename
+    
+    // create and open ReportFile output file file 
+    set repoutfile = fopen(outfilename, "w" )     
+    if repoutfile equal NULL
+    then   
+         display "Error creating/opening output file ", outfilename
+         exit
+    endif
+  
+    // prepare for reading input file and writing to output file
+    
+    set recno = 1        // starting record number
+	
+	set gcount = sizeof(student_recT)
+    display "Size of StudentRecord: ", gcount
+    // set gcount = sizeof(StudentTotalLine)
+    // display "Size of StudentTotalLine: ", gcount
+	
+    set inreclen = gcount 
+    display " "
+    set end_file = 0     // EndOfStudentFile
+    while end_file equal 0      // loop if not EOF
+    do 
+       display "reading input record: ", recno
+       set fcount = fgets(StudentRecord, inreclen, infile) 
+       
+       set j = 0
+       
+       while j < sizeof(student_recT) do
+          if StudentRecord[j] == EOS then
+              display "EOS at: ", j
+          endif
+          if StudentRecord[j] == LF then
+              display "LF at: ", j
+			  set StudentRecord[j] = EOS
+          endif
+          if StudentRecord[j] == ' ' then
+              display "Space at: ", j
+          endif   
+          increment j
+       endwhile
+                  
+       // Move data from input record to the various fields in StudentDetails
+       call memcpy using StudentDetails.StudentId, StudentRecord, 7
+       call memcpy using StudentDetails.StudentName.Surname, StudentRecord+7, 8 
+       call memcpy using StudentDetails.StudentName.Initials, StudentRecord+15, 2 
+       call memcpy using StudentDetails.DateOfBirth.YOBirth, StudentRecord+17, 4 
+       call memcpy using StudentDetails.DateOfBirth.MOBirth, StudentRecord+21, 2 
+       call memcpy using StudentDetails.DateOfBirth.DOBirth, StudentRecord+23, 2 
+       call memcpy using StudentDetails.CourseCode, StudentRecord+25, 4 
+       set  StudentDetails.Gender = StudentRecord[29]  
+       /*
+       call printf using "StuID: %s \n Name: %s %s Gender: %c\n", StudentId in StudentDetails,
+           Surname in StudentName in StudentDetails, Initials in StudentName in StudentDetails,
+            Gender in StudentDetails
+       */
+       call printf using "Input rec: %s \n", StudentRecord
+       // check for EOF
+       set end_file = feof(infile)
+       // display "end_file: ", end_file
+       
+       add 1 to StudentCount in WorkTotals
+       set gcount = StudentCount in WorkTotals
+       display "StudentCount: ", gcount     
+       //
+       if Gender in StudentDetails equal Male then
+          add 1 to MaleCount in WorkTotals
+       else 
+          add 1 to FemaleCount in WorkTotals
+       endif
+          //
+       // call printf using "num males: %d \n", MaleCount in WorkTotals
+       // call printf using "num females: %d \n", FemaleCount in WorkTotals
+       // display "processed record: ", recno
+       increment recno
+    
+    endwhile
+
+    display "\nSetup formatting for printing"
+    // setup for printing report lines
+    // setup/convert from numeric to the text formatting for printing
+    
+    // MOVE StudentCount TO PrnStudentCount 
+    call sprintf using PrnStudentCount in StudentTotalLine, "%05u", StudentCount in WorkTotals
+    call printf using "Total count: %s \n", PrnStudentCount in StudentTotalLine
+    
+    // MOVE MaleCount    TO PrnMaleCount 
+    call sprintf using PrnMaleCount in MaleTotalLine, "%05u", MaleCount in WorkTotals
+    call printf using "Male count: %s \n", PrnMaleCount in MaleTotalLine
+        
+    // MOVE FemaleCount  TO PrnFemaleCount 
+    call sprintf using PrnFemaleCount in FemaleTotalLine, "%05u", FemaleCount in WorkTotals
+    call printf using "Female count: %s \n", PrnFemaleCount in FemaleTotalLine
+    //
+    // PrintReportLines
+    // WRITE PrintLine FROM HeadingLine AFTER ADVANCING PAGE
+    // set HeadingLine[22] = EOS
+    // display "HeadLine: ", HeadingLine
+    // set PrintLine[41] = EOS
+    call strcpy using PrintLine, HeadingLine
+    // display "PrintLine: ", PrintLine 
+    
+    call fprintf using repoutfile, "%s \n", PrintLine
+    
+    // WRITE PrintLine FROM StudentTotalLine  AFTER ADVANCING 2 LINES
+    call printf using "StudentTotalLine: %s %05u \n", fill in StudentTotalLine, StudentCount in WorkTotals
+    call fprintf using repoutfile, "\n%s %05u \n", fill in StudentTotalLine, StudentCount in WorkTotals
+    
+    // WRITE PrintLine FROM MaleTotalLine  AFTER ADVANCING 2 LINES 
+    call fprintf using repoutfile, "%s %05u \n", fill in MaleTotalLine, 
+        MaleCount in WorkTotals
+    
+    // WRITE PrintLine FROM FemaleTotalLine AFTER ADVANCING 2 LINES
+    call fprintf using repoutfile, "%s %05u \n", fill in FemaleTotalLine, 
+        FemaleCount in WorkTotals 
+     
+    set totrecs = recno - 1 // total number of records processed
+    // display "\nTotal  records read and copied: ", totrecs
+    //            
+    display "closing files"
+    call fclose using infile
+    call fclose using repoutfile   
+    return 0
+endfun main
+//
+// initialize fields
+function fill_values is
+begin
+    call memcpy using fill in StudentTotalLine, "Total Students = ", 17
+    call memcpy using fill in MaleTotalLine, "Total Males    = ", 17
+    call memcpy using fill in FemaleTotalLine, "Total Females  = ", 17
+    set StudentCount in WorkTotals = 0
+    set MaleCount in WorkTotals = 0
+    set FemaleCount in WorkTotals = 0 
+endfun fill_values  
+

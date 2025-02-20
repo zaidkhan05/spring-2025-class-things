@@ -1,0 +1,51 @@
+description
+   This implements a linked list. The functions are used to
+   display, insert, and delete nodes.
+   J Garrido   */
+import "scl.h"
+
+specifications
+
+definetype struct MNode ChNode
+definetype struct ChList List
+
+struct MNode is
+     define mdata of type char
+     define next pointer of type ChNode
+endstruct MNode
+
+struct ChList is
+    define head pointer of type ChNode
+    define last pointer of type ChNode
+endstruct ChList
+
+forward declarations
+
+function isEmpty return type bool parameters plist pointer type List
+
+function insertFirst
+              parameters plist pointer type List,
+                  pnode pointer of type ChNode
+				  
+function addnode parameters plist pointer type List,
+   pnode pointer of type ChNode
+
+function getFirst return pointer type ChNode
+    parameters plist pointer type List
+
+function deleteFirst parameters plist pointer type List 
+
+function display_data parameters plist pointer type List
+
+function get_hsub return pointer type List 
+   parameters plist pointer of type List
+   
+function get_tsub return pointer type List
+   parameters plist pointer of type List
+   
+function conclist return pointer type List 
+   parameters L1 pointer of type List, L2 pointer of type List
+
+function reverse return pointer type List
+   parameters plist pointer of type List 
+   

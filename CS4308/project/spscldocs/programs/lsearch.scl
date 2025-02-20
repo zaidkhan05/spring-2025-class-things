@@ -1,0 +1,76 @@
+import "scl.h"
+/* Program: lsearch.scl
+   J Garrido 12-2-2021
+*/
+forward declarations
+function lsearch return type integer
+ parameters 
+       myarr array [] of type double, num_elements of type integer,
+	   keyval of type double
+global declarations
+constants
+   define ARRAY_SIZE of type integer = 50
+
+implementations
+
+description
+      This is the main logic of the program
+      */
+function main is  
+    variables
+      define marray array [ARRAY_SIZE] of type double
+	  define marrval of type double
+      define mkey of type double
+      define kelements of type integer
+      define j of type integer
+	  define kindex of type integer
+    begin
+      input "Number of elements in array: ", kelements
+	  input "Enter value of key: ", mkey
+      for j = 0 to kelements - 1 do  
+         input "Enter element value: ", marrval
+		 set marray[j] = marrval
+         // display "value entered: ", marray[j]
+      endfor  
+
+      // call the function to find key value	  
+      set kindex = lsearch(marray, kelements, mkey)
+      if kindex > 0 then 	  
+         display "Key found in array, index: ", kindex
+	  else
+	     display "Key not found"
+	  endif
+      exit    
+  endfun main 
+  
+description
+  This function implements a linear search
+  of an array varr using a key value. The result is the index value
+  of the element found, or -1 if none found */
+function lsearch return type integer
+ parameters 
+       varr array [] of type double, num of type integer,
+	   keyval of type double is
+ variables
+      define j of type integer
+      define found of type bool = false
+	  define tolerance of type double = 0.0001
+	  define rel of type double
+	  define result of type integer
+ begin
+      set j = 0
+	  while j < num and found not equal true do
+	    set rel = abs(varr[j] - keyval)
+        if rel <= tolerance
+        then
+           set result = j
+           set found = true
+        else
+           increment j
+        endif
+      endwhile
+      if found not equal true
+      then
+         set result = -1
+      endif
+endfun lsearch

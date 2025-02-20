@@ -1,0 +1,50 @@
+// Interface for creating and processing graphs
+
+import "scl.h"
+
+specifications
+
+definetype struct node nodeStruct
+
+struct node is 
+    define vertex of type integer
+    define next pointer of type nodeStruct	
+endstruct node
+
+definetype pointer nodeStruct nodePtr
+
+struct dsgraph is
+    define numVertices of type integer
+	define visited pointer of type bool
+    define nodeLists pointer of type nodePtr
+endstruct dsgraph
+
+definetype struct dsgraph graphstruct
+definetype pointer graphstruct graphPtr
+
+
+forward declarations
+// function specifications
+
+function createNode return type nodePtr 
+   parameters vertex of type integer
+
+// create a graph with n vertices
+function createGraph return type graphPtr 
+   parameters nvertices of type integer
+   
+// Add edge from source to destination
+// On an empty graph
+function addEdge parameters graph of type graphPtr, 
+    source of type integer, destination of type integer
+
+// Depth first traversal on the specified graph
+function depthFirstT parameters graph of type graphPtr, 
+     vertex of type integer
+//
+// Breadth first traversal	 
+function breadthFirst parameters graph of type graphPtr,
+   startVertex of type integer
+
+// Display the graph
+function displayGraph parameters graph of type graphPtr 

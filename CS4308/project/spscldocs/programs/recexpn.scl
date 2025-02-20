@@ -1,0 +1,58 @@
+description
+  This program includes a recursive function to 
+  compute exponentiation of y to the power of k
+  J Garrido
+  */
+import <stdio.h>
+import <stdlib.h>
+
+forward declarations
+ 
+ function expn return type double
+    parameters y of type double , k of type integer
+
+implementations	
+	
+description
+     This function is a test for exponentiation.
+     It calls the recursive function, expn
+     */
+function main is
+  variables                     
+       define y of type double
+       define n of type integer 
+	   define res of type double
+ begin        // body of function starts here
+       input "Enter value of y: ", y
+	   input "Enter value of n: ", n
+	   set res = expn(y, n)
+	   display "results exponentiation: ", res
+endfun main
+  //
+description
+     This function computes the exponentiation of y 
+     Recursively. To the power of k, 
+     assuming that k > 0. 
+  */
+function expn return type double
+  parameters y  of type double, k of type integer is
+ variables
+      define res of type double
+begin
+     display "expn ", y, " power ", k 
+     // base case
+     if k == 0 then
+        set res = 1.0
+     elseif k < 0 then 
+        // exceptional case
+        display "Negative value of k"
+        set res = 1.0
+     else
+        // recursive case
+        // k greater than 0
+        // recursive call
+        set res = y * expn(y, k-1)
+        display "y = ", y, " k = ", k, " expn ", res
+     endif
+     return res 
+endfun expn

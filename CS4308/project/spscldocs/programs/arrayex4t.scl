@@ -1,0 +1,187 @@
+import "scl.h"
+/* Program: arrayex4.scl 
+   This program tests various operations on arrays
+   including pointer operations
+   J Garrido, 1-7-2014
+*/
+//macro MAX 55
+// macro PI M_PI
+
+// symbol EOL 0Ah
+// symbol MNUL "\0"
+
+
+specifications
+
+struct ystruct is
+  define a of type integer
+  define b of type float
+  define c of type double
+endstruct ystruct
+
+definetype struct ystruct ystrT
+
+struct mystructure is
+     define sss of type integer
+     define x of type float
+     define y pointer of type integer
+     define rrr of type double
+     define ss of type string
+     define xxxx pointer of type ystrT
+endstruct  mystructure
+  
+enum weekdays is 
+    Monday, Tuesday, Wednesday, Thursday, Friday 
+endenum weekdays
+
+definetype enum weekdays weeksT
+
+forward declarations
+
+// struct ystruct 
+function diff return  array [] of type double 
+ parameters 
+       a array [] of type double, num_elements of type integer
+function myadd return pointer of type double 
+function myf2 return struct xsxs
+function myf3 return pointer of type ystrT
+// function myf4 return pointer of type ystrT
+
+function myf5 return pointer of type double
+  parameters
+    x of type integer , y pointer of type double ,
+	numpts of type double, tt of type integer, pttr array[] of type float
+ 
+global declarations
+
+constants
+  define MMAX  of type integer  = 45 // max elements
+variables
+  
+  define y of type double
+  define x of type double
+  define px pointer of type double
+  define varm2 array[MMAX] of type double
+structures  
+  define wday of type weeksT
+  // define  myinfile of type file
+  // define  myoutfile of type file
+
+ 
+implementations
+
+description
+  This program computes the differences of an array
+  */
+ function main is
+    constants
+      define ARRAY_SIZE of type integer  = 50 
+    variables
+	  define qq array [MMAX][ARRAY_SIZE] of type double
+      define marray array [MMAX] of type double
+      define kelements of type integer
+      define j of type integer
+	  define k of type integer
+      define kk of type integer
+	  define resd of type integer
+	  define resm of type integer
+      define myarray array [ARRAY_SIZE] of type double
+      define dyy of type double
+      define pyy pointer of type double
+	  define myname array [25] of type char
+    structures 
+      define yy of type ystrT
+      define abc of type ystrT
+      define ddd pointer of type ystrT 
+	  define eee of type weeksT
+	  define myarrayst array [ARRAY_SIZE] of type ystrT
+    begin
+	  set a in myarrayst[3] = 45
+	  set myname [0] = MNUL
+      // open input myinfile using "cinterp1.dat"
+      // open output myoutfile using "prog1.dat"
+      call ttrtt using address yy, eee
+	  set dyy = trtrtr(address yy, eee)
+      input "Number of elements: ", kelements
+	  set pyy = 2.34e-06
+      set j = 0
+      for j = 0 to kelements -1 do
+         set myarray[j] = j + (rand()+1.25)
+         display "element value: ", myarray[j] 
+      endfor
+      set abc.c = 23.5
+      set j = 7
+	  set kk = 2
+	  set resd = j / kk 
+	  set resm = j mod kk
+	  display "resd: ", resd, " resm: ", resm
+	  if j  equal to kk
+	   then
+	     display kk
+	   elseif j equals j
+	    then set k = 20
+	   else
+	      set k = 45
+	  endif
+      // set yy = myarray[j]
+      set pyy = address myarray[j]
+      set dyy = deref pyy
+      set marray = diff(address myarray, kelements)
+      file read myinfile j, kelements
+      //
+      display "Difference values in marray "
+      for j = 0 to kelements - 2 do
+         display "element: ", j, " marray[j]: ", marray[j] 
+         set marray[j] = abc.c
+         set marray[j+1] = PI * sin(y) + x^j
+         set ddd = address abc
+         set yy = deref ddd
+         set ddd->c = 23.67
+      endfor
+	  increment j
+	  display "j: ", j
+      file write myoutfile marray[j], kelements  
+      // close myoutfile
+      //close myinfile
+	  // set dyy = square()
+      return 0
+ endfun main 
+   //
+ description
+        The following function computes the differences of
+        consecutive elements in the argument array.
+   */
+ function diff return type bool
+    parameters nnn of type char
+   is
+   variables                            // local variables
+       define i of type integer         // used as index of the array
+       define n of type integer
+       define barray array [] of type double
+       define csize of type integer
+	   // define nnn of type char
+   begin
+       set n = num_elements - 1
+       // create barray array[n] of type double
+	   set csize = n*sizeof(double)
+       set barray = malloc(csize)
+       set i = 1
+       display "computing differences"
+       for i = 0 to n-1 do
+            set barray[i] = a[i+1] - a[i]
+       endfor
+	   
+	/*   
+	   if nnn == 'n'
+ 	     or nnn == 'm'
+         or nnn == 'p' 
+		 or nnn == 'q' 
+	   then
+	      set i = 12
+	   endif
+	   
+	*/   
+       return true
+ endfun diff
+
+ 

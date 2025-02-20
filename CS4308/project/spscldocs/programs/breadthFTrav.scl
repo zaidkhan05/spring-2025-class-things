@@ -1,0 +1,164 @@
+// Breadth First Traversal 
+
+// adapted from www.programiz.com/dsa/graph-bfs
+
+import "graph2h.c"
+symbol QSIZE 55
+
+specifications
+
+struct queue is
+    define items array [QSIZE] of type integer
+    define front of type integer
+    define rear of type integer
+endstruct queue
+
+definetype struct queue queueT
+definetype pointer queueT queuePtr
+ 
+forward declarations
+ 
+function createQueue return type queuePtr
+
+function enqueue parameters q of type queuePtr, svertex of type integer
+
+function dequeue return type integer parameters q of type queuePtr 
+
+function displayq parameters q of type queuePtr 
+
+function isEmpty return type bool parameters q of type queuePtr 
+
+function displayQueue parameters q of type queuePtr 
+
+
+implementations
+
+// Breadth First Traversal 
+function breadthFirst parameters graph of type graphPtr,
+   startVertex of type integer is
+ variables
+    define currentVertex of type integer
+	define adjVertex of type integer
+ structures
+    define q of type queuePtr 
+	define tnode of type nodePtr
+begin	
+    set q = createQueue()
+
+    set graph->visited[startVertex] = true
+    call enqueue using q, startVertex
+
+    while isEmpty(q) not equal true do
+       call displayQueue using q
+       set currentVertex = dequeue(q)
+       display "Visited ", currentVertex
+
+       set tnode = graph->nodeLists[currentVertex]
+
+       while tnode not equal NULL do
+          set adjVertex = tnode->vertex
+
+          if graph->visited[adjVertex] equal false then
+             set graph->visited[adjVertex] = true
+             call enqueue using q, adjVertex
+          endif
+          set tnode = tnode->next
+        endwhile
+    endwhile
+endfun breadthFirst
+
+
+// Create a queue
+function createQueue return type queuePtr
+is
+structures 
+   define q of type queuePtr
+begin 
+   create q type queueT  
+   set q->front = -1
+   set q->rear = -1
+   return q
+endfun createQueue
+//
+// Check if the queue is empty
+function isEmpty return type bool parameters q of type queuePtr 
+is
+begin
+  if q->rear == -1 then
+    return true
+  else
+    return false
+  endif
+endfun isEmpty
+//
+// Adding elements into queue
+function enqueue parameters q of type queuePtr, svertex of type integer
+is
+begin
+   if q->rear equal QSIZE - 1 then
+      display "\n Queue is full"
+   else 
+      if q->front equal -1 then
+         set q->front = 0
+	  endif
+      increment q->rear
+      set q->items[q->rear] = svertex
+    endif
+endfun enqueue
+
+// Remove an element from the queue
+function dequeue return type integer parameters q of type queuePtr 
+is
+variables
+   define item of type integer
+begin   
+   if isEmpty(q) equal true then
+      display "Queue is empty"
+      set item = -1
+   else 
+      set item = q->items[q->front]
+      increment q->front
+      if q->front > q->rear then
+        display "Resetting queue "
+        set q->front = -1
+		set q->rear = -1
+      endif
+    endif
+    return item
+endfun dequeue
+
+// display the queue
+function displayQueue parameters q of type queuePtr 
+is
+variables
+   define i of type integer
+begin   
+   set i = q->front
+
+   if isEmpty(q) equal true then
+      display "Queue is empty"
+   else 
+      display "\nQueue contains "
+      for i = q->front to q->rear  do
+          display " ", q->items[i]
+      endfor
+   endif
+endfun displayQueue
+
+function main is
+structures
+   define graph of type graphPtr
+begin   
+   set graph = createGraph(6)
+   call addEdge using graph, 0, 1
+   call addEdge using graph, 0, 2
+   call addEdge using graph, 1, 2
+   call addEdge using graph, 1, 4
+   call addEdge using graph, 1, 3
+   call addEdge using graph, 2, 4
+   call addEdge using graph, 3, 4
+
+   call breadthFirst using graph, 0
+
+   return 0
+endfun main

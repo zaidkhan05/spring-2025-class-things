@@ -1,0 +1,107 @@
+// Program for deletion of elements in Heaps
+// simple implementation 
+import "scl.h"
+ 
+forward declarations
+
+function swap parameters xp pointer of type integer,
+    yp pointer of type integer
+
+
+// Move down a subtree with root as element i 
+function moveDown parameters harr array[] of type integer,
+    i of type integer
+ 
+// Function to delete the root from Heap
+function deleteRoot parameters harr array[] of type integer
+ 
+// Display heap with numel elements
+function displayH parameters harr array[] of type integer
+
+global declarations
+
+variables
+   define numel of type integer  // number of elements in heap
+
+implementations
+// Test program
+function main
+is
+variables   
+    define harr array[25] of type integer = { 60, 25, 35, 20, 22 }
+begin 
+    set numel = 5        // current elements
+    call displayH using harr
+    call deleteRoot using harr
+    display "After deleting element 60: \n"
+    call displayH using harr
+    return 0
+endfun main
+//
+function swap parameters xp pointer of type integer,
+    yp pointer of type integer
+is
+variables
+    define temp of type integer
+begin
+    set temp = deref xp
+    set deref xp = deref yp
+    set deref yp = temp
+endfun swap
+//
+
+function moveDown parameters harr array[] of type integer,
+    i of type integer
+is
+variables
+    define largest of type integer  
+    define left of type integer  
+    define right of type integer
+begin
+    set largest = i
+    set left = 2 * i + 1
+    set right  = 2 * i + 2
+    // If left child is larger than root
+    if left < numel and harr[left] > harr[largest] then
+        set largest = left
+    endif   
+    // If right child is larger than largest so far
+    if right < numel and harr[right] > harr[largest] then
+        set largest = right
+    endif   
+    // If largest is not root
+    if largest not equal i then
+         call swap using address harr[i], address harr[largest]      
+         // Recursively mode down the affected sub-tree
+         call moveDown using harr, largest
+    endif
+endfun moveDown
+//
+function deleteRoot parameters harr array[] of type integer
+is
+variables
+    define lastElement of type integer
+begin
+    // Get the last element
+    set lastElement = harr[numel - 1]
+ 
+    // Replace root with last element
+    set harr[0] = lastElement
+ 
+    // Decrease size of heap by 1
+    set numel = numel - 1
+ 
+    // move down the root node
+    call moveDown using harr, 0
+endfun deleteRoot
+//
+function displayH parameters harr array[] of type integer
+is
+variables
+    define i of type integer
+begin   
+    for i = 0 to numel - 1 do
+        display " ", harr[i]
+    endfor
+    display "\n"
+endfun displayH

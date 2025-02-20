@@ -1,0 +1,23 @@
+// interface for a queue using double-linked list with two ends
+// file: queueh.scl
+
+import "link2h.c"
+specifications
+
+definetype struct llist queueT
+definetype struct Datablock DataT 
+definetype struct node NodeType
+definetype pointer NodeType NodePtr
+
+forward declarations
+
+function create_queue parameters queue pointer of type queueT,
+  maxn of type integer, sname pointer of type char 
+function enqueue parameters queue pointer of type queueT,
+    cdata pointer of type DataT
+function dequeue return pointer of type DataT parameters queue pointer of type queueT
+// get a copy of node at head of queue
+function head return pointer of type DataT parameters queue pointer of type queueT
+function sEmpty return type bool parameters queue pointer of type queueT
+function sFull return type bool parameters queue pointer of type queueT
+function queueSize return type integer parameters queue pointer of type queueT

@@ -1,0 +1,46 @@
+description
+   Program: arraym.c
+   This program calls a function that returns a new array as an integer pointer
+    uses an integer array as argument
+  */
+import <stdlib.h>
+import <stdio.h>
+
+forward declarations
+
+  function farraym2 return pointer of type integer
+    parameters parray constant pointer of type integer, 
+       pfact of type integer
+global declarations
+constants
+   define NUMARR of type integer = 6 
+   
+implementations
+   
+function main is
+variables
+   define j of type integer
+   define marray array [] of type integer = {1, 5, 10, 15, 20, 25}
+   define parray pointer of type integer
+begin
+   set parray = farraym2 (marray, 15)
+   for j = 0 to j < NUMARR do
+       display "Element value: ", parray[j], j
+   endfor
+   return 0
+ endfun main
+ //
+ function farraym2 return pointer of type integer
+      parameters larray constant pointer of type integer,
+         lfact of type integer
+ is
+ variables 
+      define narray pointer of type integer  
+      define j of type integer
+ begin
+      set narray = malloc(NUMARR * sizeof(integer))   
+      for j = 0 to j < NUMARR do
+          set narray[j] = larray[j] * lfact
+	  endfor
+      return narray
+ endfun farraym2

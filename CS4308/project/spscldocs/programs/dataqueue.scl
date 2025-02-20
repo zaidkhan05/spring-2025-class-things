@@ -1,0 +1,97 @@
+/* Program: dataqueue.scl
+  This program shows stack manipulation using data blocks.
+  The stack is implemented in library 'stack'.
+  Must link with  queuelib and linked2lib
+  J. M. Garrido Feb. 2022
+  */
+// import "scl.h"
+import "queueh.c"
+
+specifications
+
+struct Datablock is              // data block type
+     define stname array [31] of type char
+     define age of type integer
+     define jobcode of type integer
+endstruct Datablock
+
+definetype struct Datablock DataT
+
+forward declarations
+
+function make_dblock return pointer type DataT parameters
+      nname pointer of type char, nage of type integer, njobcode of type integer 
+function display_data return type void parameters pdata pointer of type DataT   
+
+implementations
+
+function main is
+ variables
+     define nums of type integer
+ structures
+     define dblock pointer of type DataT
+     define mqueuea of type queueT
+     define queuep pointer of type queueT
+     define nodePtr of type NodePtr
+ begin 
+   set queuep = address mqueuea
+   call create_queue using queuep, 35, "queueA"  // create empty queue
+   display "Enqueue data: "
+   set dblock = make_dblock("John Doe", 38, 1523)
+   call display_data using dblock
+   call enqueue(queuep, dblock)
+   set dblock = make_dblock("Joseph Hunt", 59, 1783)
+   display "Enqueue data: "
+   call display_data using dblock
+   call enqueue using queuep, dblock
+   set dblock = make_dblock("William Dash", 49, 2581)
+   display "Enqueue data: "
+   call display_data using dblock
+   call enqueue using queuep, dblock
+   set nums = queueSize(queuep)
+   display "Queue size: ", nums
+   display "Copy Head data from queue: "
+   set dblock = head(queuep)
+   call display_data using dblock
+   set dblock = make_dblock("David Winemaker", 48, 1854)
+   display "Enqueue: "
+   call display_data using dblock
+   call enqueue using queuep, dblock
+   set nums = queueSize(queuep)
+   display "Size of queue: ", nums
+   display "Dequeue: "
+   set dblock = dequeue(queuep)
+   call display_data using dblock
+   destroy dblock
+endfun main
+//
+function make_dblock return pointer type DataT
+    parameters pname pointer of type char, page of type integer, 
+       pjobcode of type integer is
+structures
+    define ldatab pointer of type DataT 
+begin
+    // allocate memory for datablock
+    create ldatab type DataT   
+    call strcpy using ldatab->stname, pname
+    set ldatab->age = page
+    set ldatab->jobcode = pjobcode
+    return ldatab
+endfun make_dblock
+//
+// display data block
+function display_data return type void parameters pblock pointer of type DataT is
+   variables
+      define lname array[30] of type char
+      define ljobc of type integer
+      define lage of type integer     
+begin
+    call strcpy using lname, pblock->stname
+    set ljobc = pblock->jobcode
+    set lage = pblock->age
+    display "Data name: ", lname
+    display "Data age: ", lage
+    display "Data job code: ", ljobc        
+endfun display_data
+
+

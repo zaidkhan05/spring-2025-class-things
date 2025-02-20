@@ -1,0 +1,78 @@
+description
+ This is the interface for AVL trees 
+ internal functions included */
+import "scl.h"
+specifications 
+
+definetype struct node NodeType
+definetype pointer NodeType NodePtr
+struct node is
+     define keyval of type integer 
+	 define balance of type integer
+	 define height of type integer
+     define left pointer of type NodeType  // lefttree
+     define right pointer of type NodeType // righttree
+endstruct node
+//
+definetype struct avltree avltreeT
+
+struct avltree is
+     define numnodes of type integer
+     define maxnodes of type integer
+     define lname array [30] of type char
+     define Root of type NodePtr  
+endstruct avltree
+//
+forward declarations
+
+function init_tree return pointer of type avltreeT parameters 
+    maxn of type integer, pname pointer of type char
+	
+function build_tree return type NodePtr
+     parameters ptree pointer of type avltreeT
+
+function insert return type NodePtr
+    parameters data of type integer, node of type NodePtr, 
+	   ht_inc pointer of type integer
+	   
+// struct node* search(struct node *ptr, int data)
+function searchKey return type NodePtr 
+   parameters Root of type NodePtr, keyval of type integer
+
+function preOrder_display parameters root of type NodePtr
+// void inorder(struct node *ptr)
+
+function traverse_display parameters
+  ptree pointer of type avltreeT
+  
+function empty_list return type bool parameters 
+  ptree pointer of type avltreeT   
+  
+function full_list return type bool parameters 
+  ptree pointer of type avltreeT 
+  
+// function insert_node parameters ptree pointer of type btreeT,
+//  ndata pointer of type DataT, pos of type integer
+
+function findLargestKey return type NodePtr
+     parameters Root of type NodePtr
+
+function minKeyNode return type NodePtr parameters
+    node of type NodePtr 
+    
+function searchKey return type NodePtr 
+   parameters Root of type NodePtr, keyval of type integer
+   
+function listSize return type integer
+   parameters ptree pointer of type avltreeT
+   
+function height_tree return type integer 
+   parameters Root of type NodePtr
+
+function deleteNode
+    parameters Root of type NodePtr, keyval of type integer
+	
+function deleteNode2 return type NodePtr
+    parameters Root of type NodePtr, keyval of type integer	
+    
+function destroy_tree parameters Root of type NodePtr
