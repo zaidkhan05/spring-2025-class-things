@@ -156,7 +156,7 @@ class Scanner:
                 raise Exception(f"Unexpected character: {self.current_char}")
         return self.tokens
 
-file = open("D:/spring-2025-class-things/CS4308/SPSCL_Win_soft_progs/SCL_comp_progs/spscl_progs/adjmatrix2.scl", "r")
+file = open("D:/spring-2025-class-things/CS4308/spscldocs/programs/adjmatrix2.scl", "r")
 source_code = file.read()
 
 

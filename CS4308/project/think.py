@@ -8,7 +8,7 @@ KEYWORDS = {
     'integer', 'float', 'double', 'char', 'string', 'bool', 'boolean',
     'IMPORT', 'USE', 'MAIN', 'GLOBAL', 'TRY', 'CATCH', 
     'FOR', 'WHILE', 'REPEAT', 'UNTIL', 'ENDTRY', 'ENDFOR', 
-    'ENDWHILE', 'ENDREPEAT'
+    'ENDWHILE', 'ENDREPEAT', 'pointer', 'address', 'deref'
 }
 
 # Special Characters and Operators
@@ -181,8 +181,16 @@ def main():
     
     scanner = Scanner(source_code)
     tokens = scanner.scan_tokens()
-    for token in tokens:
-        print(token)
+
+    with open('tokens.txt', 'w') as f:
+        f.write(filename)
+        f.write('\n')
+        for token in tokens:
+            print(token)
+            f.write(str(token))
+            f.write('\n')
+
+        
 
 if __name__ == "__main__":
     main()
