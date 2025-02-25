@@ -17,12 +17,19 @@ def find_missing_hat(A, N):
     ##################
     # YOUR CODE HERE #
     ##################
-    low, high = 0, N
+    low, high  = 0, len(A)
 
-    if len(A) < 1:
+    if len(A) == 0:
         return 0
+    if len(A) == 1:
+        if A[0] == 0:
+            return 1
+        else:
+            return 0
     while low <= high:
-        mid = (low + high) // 2
+        mid = (low+high)//2
+
+        # partitioning
         left, right = 0, len(A) - 1
         while left <= right:
             if A[left] < mid:
@@ -33,10 +40,9 @@ def find_missing_hat(A, N):
                 A[left], A[right] = A[right], A[left]
                 left += 1
                 right -= 1
+
         if left < mid:
             high = mid - 1
         else:
             low = mid + 1
-
-    # print(low - 1)
-    return low - 1
+    return high
