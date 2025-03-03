@@ -17,6 +17,7 @@ def dijkstra(graph, start):
                 distances[neighbor] = distance
                 previous_nodes[neighbor] = current_node
                 heapq.heappush(priority_queue, (distance, neighbor))
+        print(distances)
     
     return distances, previous_nodes
 
