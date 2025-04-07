@@ -1,4 +1,4 @@
-package Complex_Numbers is
+package complexnum is
    type Complex is record
       Real : Float;
       Imag : Float;
@@ -9,4 +9,4 @@ package Complex_Numbers is
    function Multiply(A, B : Complex) return Complex;
    function Divide(A, B : Complex) return Complex;
    procedure Print_Complex(C : Complex);
-end Complex_Numbers;
+end complexnum;

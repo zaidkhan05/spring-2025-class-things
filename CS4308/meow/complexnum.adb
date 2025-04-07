@@ -1,5 +1,5 @@
 
-package body Complex_Numbers is
+package body complexnum is
    function Add(A, B : Complex) return Complex is
    begin
       return (A.Real + B.Real, A.Imag + B.Imag);
@@ -25,4 +25,4 @@ package body Complex_Numbers is
    begin
       Put_Line(Float'Image(C.Real) & " + " & Float'Image(C.Imag) & "i");
    end Print_Complex;
-end Complex_Numbers;
+end complexnum;

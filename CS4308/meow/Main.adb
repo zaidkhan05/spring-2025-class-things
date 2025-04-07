@@ -1,9 +1,9 @@
 with Ada.Text_IO;
-with Complex_Numbers;
+with complexnum;
 use Ada.Text_IO;
-use Complex_Numbers;
+use complexnum;
 
-procedure Main is
+procedure main is
    A, B, Result : Complex;
 begin
    Put_Line("Enter first complex number (Real Imag): ");
@@ -30,4 +30,4 @@ begin
    Result := Divide(A, B);
    Put_Line("Division: ");
    Print_Complex(Result);
-end Main;
+end main;
