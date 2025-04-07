@@ -1,7 +1,5 @@
-with Complex_Types;
-use Complex_Types;
 
-package body Complex_Operations is
+package body Complex_Numbers is
    function Add(A, B : Complex) return Complex is
    begin
       return (A.Real + B.Real, A.Imag + B.Imag);
@@ -20,7 +18,11 @@ package body Complex_Operations is
    function Divide(A, B : Complex) return Complex is
       Denom : Float := B.Real * B.Real + B.Imag * B.Imag;
    begin
-      return ((A.Real * B.Real + A.Imag * B.Imag) / Denom,
-              (A.Imag * B.Real - A.Real * B.Imag) / Denom);
+      return ((A.Real * B.Real + A.Imag * B.Imag) / Denom, (A.Imag * B.Real - A.Real * B.Imag) / Denom);
    end Divide;
-end Complex_Operations;
+
+   procedure Print_Complex(C : Complex) is
+   begin
+      Put_Line(Float'Image(C.Real) & " + " & Float'Image(C.Imag) & "i");
+   end Print_Complex;
+end Complex_Numbers;

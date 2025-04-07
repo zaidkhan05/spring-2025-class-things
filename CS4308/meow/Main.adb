@@ -1,21 +1,20 @@
-with Complex_Types;
-with Complex_Operations;
-with Complex_IO;
-
-use Complex_Types;
-use Complex_Operations;
-use Complex_IO;
+with Ada.Text_IO;
+with Complex_Numbers;
+use Ada.Text_IO;
+use Complex_Numbers;
 
 procedure Main is
    A, B, Result : Complex;
 begin
-   Put_Line("Input for first complex number:");
-   Read_Complex(A);
-   Put_Line("Input for second complex number:");
-   Read_Complex(B);
+   Put_Line("Enter first complex number (Real Imag): ");
+   Get(A.Real);
+   Get(A.Imag);
+
+   Put_Line("Enter second complex number (Real Imag): ");
+   Get(B.Real);
+   Get(B.Imag);
 
    Put_Line("Results:");
-
    Result := Add(A, B);
    Put_Line("Addition: ");
    Print_Complex(Result);

@@ -1,9 +1,12 @@
-with Complex_Types;
-use Complex_Types;
+package Complex_Numbers is
+   type Complex is record
+      Real : Float;
+      Imag : Float;
+   end record;
 
-package Complex_Operations is
    function Add(A, B : Complex) return Complex;
    function Subtract(A, B : Complex) return Complex;
    function Multiply(A, B : Complex) return Complex;
    function Divide(A, B : Complex) return Complex;
-end Complex_Operations;
+   procedure Print_Complex(C : Complex);
+end Complex_Numbers;
