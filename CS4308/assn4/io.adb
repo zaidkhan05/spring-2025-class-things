@@ -1,8 +1,8 @@
 with Ada.Text_IO;         use Ada.Text_IO;
 with Ada.Float_Text_IO;   use Ada.Float_Text_IO;
-with Complex_Numbers_Pkg; use Complex_Numbers_Pkg;
+with complexnum; use complexnum;
 
-package body Input_Output_Pkg is
+package body io is
 
    procedure Read_Complex (Prompt : String; Value : out Complex) is
    begin
@@ -22,4 +22,4 @@ package body Input_Output_Pkg is
       New_Line;
    end Print_Complex;
 
-end Input_Output_Pkg;
+end io;

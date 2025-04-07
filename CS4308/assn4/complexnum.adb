@@ -1,4 +1,4 @@
-package body Complex_Numbers_Pkg is
+package body complexnum is
 
    function Add (A, B : Complex) return Complex is
    begin
@@ -26,4 +26,4 @@ package body Complex_Numbers_Pkg is
               Im => (A.Im * B.Re - A.Re * B.Im) / Denom);
    end Divide;
 
-end Complex_Numbers_Pkg;
+end complexnum;
