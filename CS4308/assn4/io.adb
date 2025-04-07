@@ -18,7 +18,10 @@ package body io is
    procedure Print_Complex (Message : String; Value : Complex) is
    begin
       Put_Line(Message);
-      Put_Line(Float'Image(Value.Re) & " + " & Float'Image(Value.Im) & "i");
+      Put(Value.Re, Fore=>0, Aft=>3, Exp=>0);
+      Put("+");
+      Put(Value.Im, Fore=>0, Aft=>3, Exp=>0);
+      Put("i");
       New_Line;
    end Print_Complex;
 
