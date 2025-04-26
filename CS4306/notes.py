@@ -51,6 +51,8 @@ def bubbleSort(array):
 
 
 
+
+
 size = 10
 array = createArray(size)
 x = array
