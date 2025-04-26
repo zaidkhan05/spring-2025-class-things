@@ -13,7 +13,7 @@ def sort(A, N):
                 left += 1
             elif A[right] >= mid:
                 right -= 1
-            else:
+            else:  
                 A[left], A[right] = A[right], A[left]
                 left += 1
                 right -= 1
