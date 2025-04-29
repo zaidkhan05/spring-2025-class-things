@@ -13,7 +13,7 @@ def main():
     try:
         serverSocket.bind((host, port))
     except socket.error as e:
-        print(f"Bind failed: {e}")
+        print(f"womp womp no more server: {e}")
         return    
     serverSocket.listen(1)
     print(f"Server listening on port {port}...")
@@ -25,9 +25,11 @@ def main():
         if not data:
             break
 
-        print(f"Received from client: {data}")
+        print(f"Message to reverse: {data}")
 
         reversedString = reverse_string(data).encode()
+        print(f"Reversed message: {reversedString.decode()}")
+
         conn.send(reversedString)
 
         if data.lower() == "end":

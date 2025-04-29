@@ -9,18 +9,18 @@ def main():
     try:
         clientSocket.connect((host, port))
     except Exception as e:
-        print(f"Connection failed: {e}")
+        print(f"Oopsies it dont wanna connect: {e}")
         return
-    
+
     while True:
-        message = input("Enter message (type 'end' to quit): ")
+        message = input("Enter the message that you want reversed (type 'end' to quit): \n")
         clientSocket.send(message.encode())
 
         data = clientSocket.recv(1024).decode()
-        print(f"Received from server: {data}")
+        print(f"Reversed message from server: {data}")
 
         if message.lower() == "end" and data.lower() == "dne":
-            print("Termination confirmed with 'dne'. Closing client.")
+            print("Recieved 'dne' from server. Server closed, closing client.")
             break
 
     clientSocket.close()
